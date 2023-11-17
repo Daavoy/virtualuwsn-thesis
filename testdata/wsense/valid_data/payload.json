@@ -1,0 +1,110 @@
+{
+  "definitions": [
+    {
+      "id": "79",
+      "name": "battery_voltage_mv",
+      "unit": "mV"
+    },
+    {
+      "id": "7",
+      "name": "conductivity",
+      "unit": "S/m"
+    },
+    {
+      "id": "30",
+      "name": "depth",
+      "unit": "m"
+    },
+    {
+      "id": "0",
+      "name": "temperature",
+      "unit": "C\u00b0"
+    }
+  ],
+  "nodes": [
+    {
+      "node": {
+        "id": "sfi_smart_ocean;demo;d1;1",
+        "treeId": "1",
+        "type": "NODE",
+        "name": "Node 1",
+        "coordinates": {
+          "latitude": 60.090717,
+          "longitude": 5.263733
+        },
+        "children": [
+          {
+            "id": "sfi_smart_ocean;demo;d1;1;AANDERAA_CONDUCTIVITY",
+            "treeId": "AANDERAA_CONDUCTIVITY",
+            "type": "PROBE",
+            "name": "Aanderaa Conductivity"
+          },
+          {
+            "id": "sfi_smart_ocean;demo;d1;1;DEPTH",
+            "treeId": "DEPTH",
+            "type": "PROBE",
+            "name": "W-Node Pressure"
+          },
+          {
+            "id": "sfi_smart_ocean;demo;d1;1;BATTERY_MODULE",
+            "treeId": "BATTERY_MODULE",
+            "type": "PROBE",
+            "name": "Battery module"
+          },
+          {
+            "id": "sfi_smart_ocean;demo;d1;1;TEMPERATURE",
+            "treeId": "TEMPERATURE",
+            "type": "PROBE",
+            "name": "W-Node Temperature"
+          }
+        ],
+        "data": [
+          {
+            "battery_voltage_mv": {
+              "data": [
+                {
+                  "timestamp": "2023-05-11T15:01:05.268000Z",
+                  "value": 3643.0,
+                  "probe_type": "BATTERY_MODULE"
+                }
+              ]
+            }
+          },
+          {
+            "conductivity": {
+              "data": [
+                {
+                  "timestamp": "2023-05-11T15:01:05.270000Z",
+                  "value": 3.343,
+                  "probe_type": "AANDERAA_CONDUCTIVITY"
+                }
+              ]
+            }
+          },
+          {
+            "depth": {
+              "data": [
+                {
+                  "timestamp": "2023-05-11T15:01:05.269000Z",
+                  "value": 4.588227469473089,
+                  "probe_type": "DEPTH"
+                }
+              ]
+            }
+          },
+          {
+            "temperature": {
+              "data": [
+                {
+                  "timestamp": "2023-05-11T15:01:05.270000Z",
+                  "value": 8.49,
+                  "probe_type": "AANDERAA_CONDUCTIVITY"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
