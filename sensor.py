@@ -5,7 +5,7 @@ from datamodels.timeseriesdata import *
 
 from abc import abstractmethod
 
-
+# Base class for all sensors
 class Sensor:
 
     def __init__(self, source: str, parameter: str, unit: str):
@@ -17,8 +17,23 @@ class Sensor:
     def simulate_value(self) -> str:
         pass
 
-    def read(self) -> Observation:
+    def read(self) -> str:
+        pass
+    
 
+# VirtualSensor class for custom generated sensor data in the TimeSeriesData format
+class VirtualSensor:
+
+    def __init__(self, source: str, parameter: str, unit: str):
+        self.source = source
+        self.parameter = parameter
+        self.unit = unit
+
+    @abstractmethod
+    def simulate_value(self) -> str:
+        pass
+
+    def read(self) -> str:
         NO_DATAQUALITY_CODE = 0
 
         obs = Observation(source=self.source,
@@ -30,7 +45,7 @@ class Sensor:
         return obs
 
 
-class TemperatureSensor(Sensor):
+class TemperatureSensor(VirtualSensor):
 
     def __init__(self, source: str):
         super().__init__(source, "temperature", "degree celcius")
@@ -44,7 +59,7 @@ class TemperatureSensor(Sensor):
         return str(temp)
 
 
-class ConductivitySensor(Sensor):
+class ConductivitySensor(VirtualSensor):
 
     def __init__(self, source: str):
         super().__init__(source, "conductivity", "S/m")
@@ -58,7 +73,7 @@ class ConductivitySensor(Sensor):
         return str(cond)
 
 
-class BatterySensor(Sensor):
+class BatterySensor(VirtualSensor):
 
     def __init__(self, source: str):
         super().__init__(source, "battery level", "percentage")

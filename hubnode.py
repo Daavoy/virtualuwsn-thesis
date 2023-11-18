@@ -1,31 +1,31 @@
-
 from sensor import Sensor
 from typing import List
 
 from datamodels.timeseriesdata import *
 
-import logging
-import time
+from abc import abstractmethod
 
-log_format = "%(asctime)s: %(message)s"
-logging.basicConfig(format=log_format, level=logging.INFO, datefmt="%H:%M:%S")
+class HubNode: 
 
-
-class SensorHubNode:
-
-    def __init__(self, description: str, origin: str, timeseries: str, location: Location, sensors: List[Sensor]):
+    def __init__(self, description: str, origin: str, timeseries: str, location: Location):
         self.description = description
         self.origin = origin
         self.location = location
-        self.sensors = sensors
         self.timeseries = timeseries
 
+    @abstractmethod
+    def transmit(self) -> str:
+        pass
+
+class SensorHubNode(HubNode):
+
+    def __init__(self, description: str, origin: str, timeseries: str, location: Location, sensors: List[Sensor]):
+        super().__init__(description, origin, timeseries, location)
+        self.sensors = sensors
+
     def generate_datapoint(self) -> DataPoint:
-
         obs = [sensor.read() for sensor in self.sensors]
-
         time_now = datetime.datetime.now()
-
         time_now_local = time_now.astimezone()
 
         data_point = DataPoint(location=self.location,
@@ -35,11 +35,8 @@ class SensorHubNode:
         return data_point
 
     def generate_timeseries_data(self) -> TimeSeriesData:
-
         SMARTOCEAN_FORMAT = "SMARTOCEAN_V0"
-
         data_point = self.generate_datapoint()
-
         data_points = [data_point]
 
         meta_data = MetaData(description=self.description,
@@ -52,19 +49,9 @@ class SensorHubNode:
         return ts_data
 
     def generate_timeseries_data_json(self) -> str:
-
         ts_data = self.generate_timeseries_data()
-
-        return ts_data.json()
+        return ts_data.json(indent=4)
 
     def transmit(self) -> str:
-
         return self.generate_timeseries_data_json()
 
-    def run(self, count, sleep_time):
-
-        for i in range(1, count):
-            ts_data = self.generate_timeseries_data_json()
-            logging.info(f'{ts_data}')
-
-            time.sleep(sleep_time)
