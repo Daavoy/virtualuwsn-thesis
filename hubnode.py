@@ -1,5 +1,6 @@
 from sensor import Sensor
 from typing import List
+import os
 
 from datamodels.timeseriesdata import *
 
@@ -7,10 +8,9 @@ from abc import abstractmethod
 
 class HubNode: 
 
-    def __init__(self, description: str, origin: str, timeseries: str, location: Location):
+    def __init__(self, description: str, origin: str, timeseries: str):
         self.description = description
         self.origin = origin
-        self.location = location
         self.timeseries = timeseries
 
     @abstractmethod
@@ -20,7 +20,8 @@ class HubNode:
 class SensorHubNode(HubNode):
 
     def __init__(self, description: str, origin: str, timeseries: str, location: Location, sensors: List[Sensor]):
-        super().__init__(description, origin, timeseries, location)
+        super().__init__(description, origin, timeseries)
+        self.location = location
         self.sensors = sensors
 
     def generate_datapoint(self) -> DataPoint:
@@ -54,4 +55,30 @@ class SensorHubNode(HubNode):
 
     def transmit(self) -> str:
         return self.generate_timeseries_data_json()
+    
+
+class DataFileHubNode(HubNode):
+
+    def __init__(self, description: str, origin: str, timeseries: str, data_path: str):
+        super().__init__(description, origin, timeseries)
+        self.data_path = data_path
+        self.data_files = [f for f in os.listdir(self.data_path) if os.path.isfile(os.path.join(self.data_path, f))]
+        self.current_file_index = 0
+
+    def generate_data(self) -> str:
+        if(len(self.data_files) == 0):
+            raise Exception(f"No data files found in '{self.data_path}'")
+        if(self.current_file_index >= len(self.data_files)): self.current_file_index = 0 
+
+        data_file_name = self.data_files[self.current_file_index]
+        data_file_path = os.path.join(self.data_path, data_file_name)
+
+        with open(data_file_path, 'r') as data_file:
+            test_data = data_file.read()
+        
+        self.current_file_index = (self.current_file_index + 1) % len(self.data_files)
+        return test_data
+
+    def transmit(self) -> str:
+        return self.generate_data()
 
