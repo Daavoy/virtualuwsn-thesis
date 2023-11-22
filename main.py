@@ -3,7 +3,7 @@ from decouple import config
 import argparse
 import os
 
-from mqttclient import MQTTClient
+from mqttclient import MQTTPublisher
 from gateway import Gateway
 from datamodels.timeseriesdata import Location
 from virtualhubnode import VirtualSensorHubNode, DataFileHubNode
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         sys.exit(1) 
 
     # MQTT setup
-    mqtt_publisher = MQTTClient(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD, "publisher.log")
+    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD, "publisher.log")
 
     # VUWSN setup
     gateway = None

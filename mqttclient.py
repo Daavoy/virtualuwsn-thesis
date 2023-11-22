@@ -1,8 +1,10 @@
 import paho.mqtt.client as paho
+from paho.mqtt.properties import Properties, PacketTypes
 from paho.mqtt.client import MQTT_ERR_SUCCESS
 from utils.log_utils import getTimedRotatingFileHandler
+import time
 
-class MQTTClient:
+class MQTTPublisher:
 
     def __init__(self, broker_url, broker_port, topic, qos, username, password, logfile):
         self.BROKER_URL = broker_url
@@ -13,15 +15,15 @@ class MQTTClient:
         self.PASSWORD = password
 
         # Setup publisher logging
-        self.logger = getTimedRotatingFileHandler("MQTT Client Rotating Log", logfile)
+        self.logger = getTimedRotatingFileHandler("MQTT Publisher Rotating Log", logfile)
 
-        self.publisher = paho.Client()
+        self.publisher = paho.Client(protocol=paho.MQTTv5)
         self.initPublisher()
 
         self.log(self.__str__())
 
     def __str__(self) -> str:
-        return ''.join((f'MQTT Client Configuration: \n',
+        return ''.join((f'MQTT Publisher Configuration: \n',
                         f'BROKER: {self.BROKER_URL}:{self.BROKER_PORT} \n',
                         f'TOPIC: {self.TOPIC}:{self.QOS}'))
 
@@ -38,22 +40,27 @@ class MQTTClient:
     def on_publish(self, client, userdata, mid):
         self.log(f'Publisher: [on_publish {mid}]')
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc, properties=None):
         if rc == 0:
             self.log("Publisher: [Connected]")
         else:
             self.log(f"Publisher: [Failed to connect with code {rc}]")
 
-    def on_disconnect(self, client, userdata, rc):
+    def on_disconnect(self, client, userdata, rc, properties=None):
         self.log("Publisher: [Disconnected]")
 
-    def publish(self, data: str):
+    def publish(self, data: str, id:int):
         self.log("Publisher: [Connecting]")
         self.publisher.connect(host=self.BROKER_URL, port=self.BROKER_PORT)
         self.publisher.loop_start()
 
+        # user properties
+        publish_properties = Properties(PacketTypes.PUBLISH) 
+        publish_properties.UserProperty = ("unique_message_id", str(id)) 
+        publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
+
         # publish
-        result = self.publisher.publish(self.TOPIC, data, self.QOS, True) 
+        result = self.publisher.publish(self.TOPIC, data, self.QOS, False, publish_properties)
         published = False
 
         # disconnect if PUBLISH was successfully sent
@@ -66,7 +73,7 @@ class MQTTClient:
 
         # otherwise - error handling
         else:
-            self.log("Publisher: Error publishing data to broker")  # revert start time
+            self.log("Publisher: Error publishing data to broker") 
 
         self.publisher.loop_stop(force=False)
         return published

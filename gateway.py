@@ -7,13 +7,13 @@ class Gateway:
         self.name = name
         self.hub = sensorhub
 
-    def run(self, count, sleep_time, transmit):
+    def run(self, count, sleep_time, publish):
 
         for i in range(1, count+1):
             data = self.hub.transmit()
 
-            if transmit:
-                transmit(data)
+            if publish:
+                publish(data,i)
             else:
                 print(f'Client - not transmitting') # use logger instead
 
