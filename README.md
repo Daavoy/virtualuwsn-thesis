@@ -13,8 +13,6 @@ python -m pip install -r requirements.txt
 
 # Configuration
 
-MQTT broker configuration and credentials for the broker is to be placed in a `.env` file with the content:
-
 ```
 BROKER_URL=url
 BROKER_PORT=port
@@ -26,7 +24,18 @@ NR_OF_MESSAGES=nr_of_message
 PUBLISH_SLEEP_TIME=publish_sleep_time
 ```
 
+The default configuration of the VUWSN is to generate data in the SmartOcean format. To simulate historic data from files, another environment variable must be provided:
+```
+TESTDATA_PATH=path_to_data
+```
+
+## Running locally
+MQTT broker configuration and credentials are to be placed in a `.env` file
+
+## Running in Docker container
+MQTT broker configuration and credentials have to be provided as environment variables to the container
+
 # Execution
-The main.py script can be execute with or without data_path arg:
-* Without data_path arg a VirtualSensorHubNode transmits generated data in the SmartOcean format
-* With a valid data_path arg a DataFileHubNode transmits historical data from data files found at the provided path
+Running the main.py will start the simulation based on the configuration:
+* If the TESTDATA_PATH is present and valid, a DataFileHubNode transmits historical data from data files found at the provided path
+* If not a VirtualSensorHubNode transmits generated data in the SmartOcean format
