@@ -1,5 +1,6 @@
 from hubnode import *
 import time
+import hashlib
 
 class Gateway:
 
@@ -15,7 +16,9 @@ class Gateway:
             data = hub.transmit()
 
             if publish:
-                publish(data,i)
+                data_to_hash = f"{i}{time.time()}"
+                id = hashlib.sha256(data_to_hash.encode()).hexdigest()
+                publish(data,id)
             else:
                 print(f'Hub ({hub.description}) - not transmitting') # use logger instead
 
