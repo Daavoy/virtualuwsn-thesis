@@ -39,13 +39,13 @@ if __name__ == "__main__":
     if TESTDATA_PATH is None or TESTDATA_PATH == "":
         location = Location(latitude=60.3692257067, longitude=5.3505234505, elevation=0)
         node = VirtualSensorHubNode("Virtual Sensor Node", location)
-        gateway = Gateway("Virtual Gateway", node)
+        gateway = Gateway("Virtual Gateway", [node])
     elif not os.path.exists(TESTDATA_PATH):
         print(f"Error: The data_path '{TESTDATA_PATH}' does not exist.")
     else:
         origin = f"Data File Node {TESTDATA_PATH}"
         node = DataFileHubNode("Simulated data from data files", origin, origin, TESTDATA_PATH)
-        gateway = Gateway(f"Data File Gateway {TESTDATA_PATH}", node)
+        gateway = Gateway(f"Data File Gateway {TESTDATA_PATH}", [node])
     
     if gateway is not None:
         if NR_OF_MESSAGES >= 0 and PUBLISH_SLEEP_TIME >= 0:
