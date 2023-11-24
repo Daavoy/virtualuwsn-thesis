@@ -5,8 +5,8 @@ import os
 from mqttclient import MQTTPublisher
 from gateway import Gateway
 from datamodels.timeseriesdata import Location
-from virtualhubnode import VirtualSensorHubNode
-from hubnode import DataFileHubNode
+from hubnode import HubNode
+from vuwsn import *
 
 if __name__ == "__main__":
     # Get environment variables
@@ -38,14 +38,16 @@ if __name__ == "__main__":
 
     if TESTDATA_PATH is None or TESTDATA_PATH == "":
         location = Location(latitude=60.3692257067, longitude=5.3505234505, elevation=0)
-        node = VirtualSensorHubNode("Virtual Sensor Node", location)
-        gateway = Gateway("Virtual Gateway", [node])
+        vuwsn = TempCondBattVUWSN("VUWSN", location)
+        node = HubNode("VUWSN for SmartOcean data", "VUWSN", vuwsn)
+        gateway = Gateway("Virtual SmartOcean Gateway", [node])
     elif not os.path.exists(TESTDATA_PATH):
         print(f"Error: The data_path '{TESTDATA_PATH}' does not exist.")
     else:
-        origin = f"Data File Node {TESTDATA_PATH}"
-        node = DataFileHubNode("Simulated data from data files", origin, origin, TESTDATA_PATH)
-        gateway = Gateway(f"Data File Gateway {TESTDATA_PATH}", [node])
+        origin = f"Data File {TESTDATA_PATH}"
+        vuwsn = FileVUWSN("Data File VUWSN", TESTDATA_PATH)
+        node = HubNode("VUWSN for historic data", origin, vuwsn)
+        gateway = Gateway(f"Virtual Data File Gateway {TESTDATA_PATH}", [node])
     
     if gateway is not None:
         if NR_OF_MESSAGES >= 0 and PUBLISH_SLEEP_TIME >= 0:
