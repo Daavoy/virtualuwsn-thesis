@@ -19,9 +19,5 @@ COPY . /app
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-# Check if TESTDATA_PATH environment variable is set
-ARG TESTDATA_PATH
-RUN if [ -n "$TESTDATA_PATH" ]; then cp -r $TESTDATA_PATH/* /app/; fi
-
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 CMD ["python", "main.py"]
