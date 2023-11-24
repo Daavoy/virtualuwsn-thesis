@@ -56,4 +56,4 @@ if __name__ == "__main__":
             print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {NR_OF_MESSAGES}, {PUBLISH_SLEEP_TIME}")
     else:
         # log error
-        print("Error: Gateway was not configured correclty")
+        print("Error: Gateway was not configured correctly")
