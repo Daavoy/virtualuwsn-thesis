@@ -1,12 +1,12 @@
 import paho.mqtt.client as paho
 from paho.mqtt.properties import Properties, PacketTypes
 from paho.mqtt.client import MQTT_ERR_SUCCESS
-from utils.log_utils import getTimedRotatingFileHandler
+from utils.log_utils import getFileHandler
 import time
 
 class MQTTPublisher:
 
-    def __init__(self, broker_url, broker_port, topic, qos, username, password, logfile):
+    def __init__(self, broker_url, broker_port, topic, qos, username, password):
         self.BROKER_URL = broker_url
         self.BROKER_PORT = broker_port
         self.TOPIC = topic
@@ -15,7 +15,7 @@ class MQTTPublisher:
         self.PASSWORD = password
 
         # Setup publisher logging
-        self.logger = getTimedRotatingFileHandler("MQTT Publisher Rotating Log", logfile)
+        self.logger = getFileHandler("logs/publisher")
 
         self.publisher = paho.Client(protocol=paho.MQTTv5)
         self.initPublisher()

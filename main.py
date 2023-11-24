@@ -29,7 +29,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # MQTT setup
-    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD, "logs/publisher.log")
+    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD)
 
     # VUWSN setup
     gateway = None
