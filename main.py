@@ -34,7 +34,8 @@ if __name__ == "__main__":
     # VUWSN setup
     gateway = None
 
-    TESTDATA_PATH = config("TESTDATA_PATH", default="") # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
+    TESTDATA_PATH = config("TESTDATA_PATH", default="").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
+
 
     if TESTDATA_PATH is None or TESTDATA_PATH == "":
         location = Location(latitude=60.3692257067, longitude=5.3505234505, elevation=0)
