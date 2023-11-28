@@ -3,7 +3,7 @@
 The main purpose of the virtual underwater sensor network is to be able inject simulated data into the SmartOcean platform. 
 The data can be simulated in various ways:
 * From historic data files
-* Custom generated data
+* Custom generated data in SmartOcean format
 
 # Install
 
