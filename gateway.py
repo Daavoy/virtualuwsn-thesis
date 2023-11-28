@@ -10,6 +10,7 @@ class Gateway:
 
     def run(self, count, sleep_time, publish):
         hub_idx = 0
+        time.sleep(10) # wait before starting simulation
 
         for i in range(1, count+1):
             hub = self.hubs[hub_idx]
