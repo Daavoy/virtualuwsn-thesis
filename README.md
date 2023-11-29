@@ -28,17 +28,22 @@ python -m pip install -r requirements.txt
 The default configuration of the VUWSN is to generate data in the SmartOcean format. To simulate historic data from files, the TESTDATA_PATH environment variable must be provided:
 
 Current testdata includes:
-* testdata/aadi/erroneous_data (AADI data with errors)
+* testdata/aadi/erroneous_data (sample of AADI data with errors)
 * testdata/aadi/SFI_Austevoll_NordDestination (AADI data from Austevoll North)
 * testdata/aadi/SFI_Austevoll_SorDestination (AADI data from Austevoll Sor)
-* testdata/aadi/valid_data
-* wsense/valid_data
+* testdata/aadi/valid_data (sample of valid AADI data)
+* wsense/valid_data (sample of valid WSense data)
 
 ## Running locally
-MQTT broker credentials and experiment configuration are to be placed in a `.env` file
+MQTT broker credentials and experiment configuration are to be placed in an `.env` file
 
 ## Running in Docker container
-MMQTT broker credentials and experiment configuration have to be provided as environment variables to the container, e.g. by providing an .env file when running the container:
+To create a docker image, use the docker build command with the Dockerfile as input. 
+```
+docker build -t <image_name>:<tag> -f Dockerfile .
+```
+
+MQTT broker credentials and experiment configuration have to be provided as environment variables to the container, e.g. by providing an .env file when running the container:
 ```
 docker run --env-file .env  --name <name> <image_name>
 ```
@@ -53,4 +58,4 @@ docker run --env-file .env --name SO-vuwsn virtualuwsn
 # Execution
 Running the main.py will start the simulation based on the configuration:
 * If the TESTDATA_PATH is present and valid, the hubnode will be connected to a FileVUWSN that transmits historical data from data files found at the provided path
-* If not a TempCondBattVUWSN (consisting of temperature, conductivity and battery sensor) transmits generated data in the SmartOcean format
+* If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean format
