@@ -52,7 +52,7 @@ if __name__ == "__main__":
     
     if gateway is not None:
         if NR_OF_MESSAGES >= 0 and PUBLISH_SLEEP_TIME >= 0:
-                gateway.run(NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
+            gateway.run(NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
         else:
             print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {NR_OF_MESSAGES}, {PUBLISH_SLEEP_TIME}")
     else:

@@ -44,36 +44,40 @@ class MQTTPublisher:
         if rc == 0:
             self.log("Publisher: [Connected]")
         else:
-            self.log(f"Publisher: [Failed to connect with code {rc}]")
+            self.log(f"Publisher: [Failed to connect with code: {rc}]")
 
     def on_disconnect(self, client, userdata, rc, properties=None):
         self.log("Publisher: [Disconnected]")
 
     def publish(self, data: str, id:int):
+        published = False
         self.log("Publisher: [Connecting]")
         self.publisher.connect(host=self.BROKER_URL, port=self.BROKER_PORT)
-        self.publisher.loop_start()
+        if self.publisher.is_connected():
+            self.publisher.loop_start()
 
-        # user properties
-        publish_properties = Properties(PacketTypes.PUBLISH) 
-        publish_properties.UserProperty = ("unique_message_id", str(id)) 
-        publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
+            # user properties
+            publish_properties = Properties(PacketTypes.PUBLISH) 
+            publish_properties.UserProperty = ("unique_message_id", str(id)) 
+            publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
 
-        # publish
-        result = self.publisher.publish(self.TOPIC, data, self.QOS, False, publish_properties)
-        published = False
+            # publish
+            result = self.publisher.publish(self.TOPIC, data, self.QOS, False, publish_properties)
 
-        # disconnect if PUBLISH was successfully sent
-        if result.rc is MQTT_ERR_SUCCESS or result.is_published():
-            result.wait_for_publish(60)
-            mid = result.mid
-            self.publisher.disconnect()
-            published = True
-            self.log(f"Publisher: [Published data] \n {data}")
+            # disconnect if PUBLISH was successfully sent
+            if result.rc is MQTT_ERR_SUCCESS or result.is_published():
+                result.wait_for_publish(60)
+                mid = result.mid
+                self.publisher.disconnect()
+                published = True
+                self.log(f"Publisher: [Published data] \n {data}")
 
-        # otherwise - error handling
+            # otherwise - error handling
+            else:
+                self.log("Publisher: Error publishing data to broker") 
         else:
-            self.log("Publisher: Error publishing data to broker") 
+            # TODO: try to reconnect?
+            self.log("Publisher: Could not publish do to error connecting to broker")
 
         self.publisher.loop_stop(force=False)
         return published
