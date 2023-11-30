@@ -47,7 +47,7 @@ class Gateway:
 
             time.sleep(sleep_time)
 
-        self.log(f'Gateway finished transmitting data. Transmitted {count - nr_of_failed_transmits}/{nr_of_failed_transmits} messages')
+        self.log(f'Gateway finished transmitting data. Transmitted {count - nr_of_failed_transmits}/{count} messages')
 
     # TODO: Add method to add/remove hubs to gateway?
 

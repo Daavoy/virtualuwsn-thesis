@@ -53,7 +53,7 @@ class MQTTPublisher:
         published = False
         self.log("Publisher: [Connecting]")
         self.publisher.connect(host=self.BROKER_URL, port=self.BROKER_PORT)
-        if self.publisher.is_connected():
+        try:
             self.publisher.loop_start()
 
             # user properties
@@ -65,19 +65,19 @@ class MQTTPublisher:
             result = self.publisher.publish(self.TOPIC, data, self.QOS, False, publish_properties)
 
             # disconnect if PUBLISH was successfully sent
-            if result.rc is MQTT_ERR_SUCCESS or result.is_published():
+            if result.rc is MQTT_ERR_SUCCESS:
                 result.wait_for_publish(60)
-                mid = result.mid
-                self.publisher.disconnect()
-                published = True
-                self.log(f"Publisher: [Published data] \n {data}")
+                if result.is_published():
+                    self.publisher.disconnect()
+                    published = True
+                    self.log(f"Publisher: [Published data] \n {data}")
 
             # otherwise - error handling
             else:
-                self.log("Publisher: Error publishing data to broker") 
-        else:
-            # TODO: try to reconnect?
-            self.log("Publisher: Could not publish do to error connecting to broker")
+                self.log(f"Publisher: Error publishing data to broker. rc: {result.rc}") 
+        except Exception as e:
+            self.log(f"Publisher: Could not publish due to error: {e}")
+        finally:
+            self.publisher.loop_stop(force=False)
 
-        self.publisher.loop_stop(force=False)
         return published
