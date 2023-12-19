@@ -15,6 +15,7 @@ if __name__ == "__main__":
         TOPIC = config('TOPIC')
         USERNAME = config('BROKER_USERNAME')
         PASSWORD = config('BROKER_PASSWORD')
+        TLS_ENABLED = config('TLS_ENABLED', default=True, cast=bool)
 
         try:
             NR_OF_MESSAGES = config('NR_OF_MESSAGES', cast=int)
@@ -29,7 +30,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # MQTT setup
-    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD)
+    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD, TLS_ENABLED)
 
     # VUWSN setup
     gateway = None

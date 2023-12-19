@@ -6,19 +6,20 @@ import time
 
 class MQTTPublisher:
 
-    def __init__(self, broker_url, broker_port, topic, qos, username, password):
+    def __init__(self, broker_url, broker_port, topic, qos, username, password, tls_enabled=True):
         self.BROKER_URL = broker_url
         self.BROKER_PORT = broker_port
         self.TOPIC = topic
         self.QOS = qos
         self.USERNAME = username
         self.PASSWORD = password
+        self.TLS_ENABLED = tls_enabled
 
         # Setup publisher logging
         self.logger = getFileHandler("logs/publisher")
 
         self.publisher = paho.Client(protocol=paho.MQTTv5)
-        self.initPublisher()
+        self.init_publisher()
 
         self.log(self.__str__())
 
@@ -30,11 +31,12 @@ class MQTTPublisher:
     def log(self, msg: str):
         self.logger.info(msg)
 
-    def initPublisher(self):
+    def init_publisher(self):
         self.publisher.on_publish = self.on_publish
         self.publisher.on_connect = self.on_connect
         self.publisher.on_disconnect = self.on_disconnect
-        self.publisher.tls_set(tls_version=paho.ssl.PROTOCOL_TLS)
+        if self.TLS_ENABLED: 
+            self.publisher.tls_set(tls_version=paho.ssl.PROTOCOL_TLS)
         self.publisher.username_pw_set(self.USERNAME, self.PASSWORD)
 
     def on_publish(self, client, userdata, mid):

@@ -23,6 +23,7 @@ python -m pip install -r requirements.txt
 | BROKER_PASSWORD     | Password for connecting to the MQTT broker        | Yes       | -           |
 | NR_OF_MESSAGES      | Number of messages published for each experiment  | Yes       | -           |
 | PUBLISH_SLEEP_TIME  | Interval between each publish                     | Yes       | -           |
+| TLS_ENABLED         | Determines if the client is configured with TLS   | Yes       | True        |
 | TESTDATA_PATH       | Path to test data                                 | No        | -           |
 
 The default configuration of the VUWSN is to generate data in the SmartOcean format. To simulate historic data from files, the TESTDATA_PATH environment variable must be provided:
