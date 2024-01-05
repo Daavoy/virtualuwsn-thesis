@@ -2,6 +2,7 @@ from hubnode import *
 import time
 import hashlib
 from utils.log_utils import getFileHandler
+from paho.mqtt.properties import Properties, PacketTypes
 
 class Gateway:
 
@@ -32,9 +33,14 @@ class Gateway:
             data = hub.transmit()
 
             if publish:
+                # Add properties for analytics
                 data_to_hash = f"{i}{time.time()}"
                 id = hashlib.sha256(data_to_hash.encode()).hexdigest()
-                if publish(data,id):
+                publish_properties = Properties(PacketTypes.PUBLISH) 
+                publish_properties.UserProperty = ("unique_message_id", str(id)) 
+                publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
+
+                if publish(data, publish_properties):
                     self.log(f'Hub ({hub.description}) - transmitted data')
                 else:
                     self.log(f'Hub ({hub.description}) - failed to transmit data')

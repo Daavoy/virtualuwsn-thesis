@@ -1,61 +1,52 @@
 import sys
 from decouple import config
 import os
+import logging
 
-from mqttclient import MQTTPublisher
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from mqtt_connector.mqtt_client import MQTTPublisher
+
 from gateway import Gateway
 from datamodels.timeseriesdata import Location
 from hubnode import HubNode
 from vuwsn import *
+from utils.config_utils import *
 
 if __name__ == "__main__":
-    # Get environment variables
+    # Get VUWSN config
     try:
-        BROKER_URL = config('BROKER_URL')
-        TOPIC = config('TOPIC')
-        USERNAME = config('BROKER_USERNAME')
-        PASSWORD = config('BROKER_PASSWORD')
-        TLS_ENABLED = config('TLS_ENABLED', default=True, cast=bool)
+        config = getVUWSNConfig()
+        # VUWSN setup
+        gateway = None
 
-        try:
-            NR_OF_MESSAGES = config('NR_OF_MESSAGES', cast=int)
-            PUBLISH_SLEEP_TIME = config('PUBLISH_SLEEP_TIME', cast=int)
-            BROKER_PORT = config('BROKER_PORT', cast=int)
-            QOS = config('QOS', cast=int)
-        except ValueError as e:
-            print(f"Value error when casting environment variable to int: {e}")
-            sys.exit(1) 
+        if config.TESTDATA_PATH is None or config.TESTDATA_PATH == "":
+            location = Location(latitude=60.3692257067, longitude=5.3505234505, elevation=0)
+            vuwsn = TempCondBattVUWSN("VUWSN", location)
+            node = HubNode("VUWSN for SmartOcean data", "VUWSN", vuwsn)
+            gateway = Gateway("Virtual SmartOcean Gateway", [node])
+        elif not os.path.exists(config.TESTDATA_PATH):
+            print(f"Error: The data_path '{config.TESTDATA_PATH}' does not exist.")
+        else:
+            origin = f"Data File {config.TESTDATA_PATH}"
+            vuwsn = FileVUWSN("Data File VUWSN", config.TESTDATA_PATH)
+            node = HubNode("VUWSN for historic data", origin, vuwsn)
+            gateway = Gateway(f"Virtual Data File Gateway {config.TESTDATA_PATH}", [node])
+        
+        if gateway is not None:
+            if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_SLEEP_TIME >= 0:
+                # MQTT setup
+                
+                mqtt_publisher = MQTTPublisher("Publisher", config.BROKER, config.BROKER_PORT, config.TOPIC, config.QOS, config.USERNAME, 
+                                               config.PASSWORD, config.RECONNECT_CONFIG, gateway.logger, config.RETAIN, use_tls=config.TLS_ENABLED)
+                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
+            else:
+                print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {config.NR_OF_MESSAGES}, {config.PUBLISH_SLEEP_TIME}")
+        else:
+            # log error
+            print("Error: Gateway was not configured correctly")
+
     except Exception as e:
-        print(f"Error when reading environment variables: {e}")
+        logging.error({e})
         sys.exit(1)
 
-    # MQTT setup
-    mqtt_publisher = MQTTPublisher(BROKER_URL, BROKER_PORT, TOPIC, QOS, USERNAME, PASSWORD, TLS_ENABLED)
-
-    # VUWSN setup
-    gateway = None
-
-    TESTDATA_PATH = config("TESTDATA_PATH", default="").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
-
-
-    if TESTDATA_PATH is None or TESTDATA_PATH == "":
-        location = Location(latitude=60.3692257067, longitude=5.3505234505, elevation=0)
-        vuwsn = TempCondBattVUWSN("VUWSN", location)
-        node = HubNode("VUWSN for SmartOcean data", "VUWSN", vuwsn)
-        gateway = Gateway("Virtual SmartOcean Gateway", [node])
-    elif not os.path.exists(TESTDATA_PATH):
-        print(f"Error: The data_path '{TESTDATA_PATH}' does not exist.")
-    else:
-        origin = f"Data File {TESTDATA_PATH}"
-        vuwsn = FileVUWSN("Data File VUWSN", TESTDATA_PATH)
-        node = HubNode("VUWSN for historic data", origin, vuwsn)
-        gateway = Gateway(f"Virtual Data File Gateway {TESTDATA_PATH}", [node])
     
-    if gateway is not None:
-        if NR_OF_MESSAGES >= 0 and PUBLISH_SLEEP_TIME >= 0:
-            gateway.run(NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
-        else:
-            print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {NR_OF_MESSAGES}, {PUBLISH_SLEEP_TIME}")
-    else:
-        # log error
-        print("Error: Gateway was not configured correctly")
