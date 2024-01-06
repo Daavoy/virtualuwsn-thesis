@@ -1,5 +1,4 @@
 import sys
-from decouple import config
 import os
 import logging
 

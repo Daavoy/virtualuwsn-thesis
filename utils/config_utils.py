@@ -76,7 +76,7 @@ def getVUWSNConfig()->VUWSNConfig:
             RECONNECT_MAX_DELAY = conf.get('RECONNECT_MAX_DELAY', 120)
             NR_OF_MESSAGES = conf.get('NR_OF_MESSAGES', 5)
             PUBLISH_SLEEP_TIME = conf.get('PUBLISH_SLEEP_TIME', 5)
-            TLS_ENABLED = conf.get('TLS_ENABLED', 5)
+            TLS_ENABLED = conf.get('TLS_ENABLED', False)
             TESTDATA_PATH = config("TESTDATA_PATH", default="").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
     except Exception as e:
         raise VUWSNConfigurationException(f"Error when reading from config file: {e}")
