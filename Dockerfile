@@ -8,11 +8,14 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY requirements.txt .
+COPY virtualuwsn/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
-COPY . /app
+COPY  virtualuwsn /app
+
+# Copy mqtt_connector from the parent folder to the /app folder
+COPY mqtt_connector /app/mqtt_connector
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
