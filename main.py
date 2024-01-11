@@ -12,9 +12,10 @@ from vuwsn import *
 from utils.config_utils import *
 
 if __name__ == "__main__":
-    # Get VUWSN config
     try:
+        # Get VUWSN config   
         config = getVUWSNConfig()
+
         # VUWSN setup
         gateway = None
 
