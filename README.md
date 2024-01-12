@@ -24,20 +24,20 @@ Credentials for the broker is to be placed in a .env file with the following con
 
 The remaining configuration is placed in a .yml file with the following content. 
 
-| Config variable     | Explanation                                                                   | Mandatory | Default     |
-|---------------------|-------------------------------------------------------------------------------|-----------|-------------|
-| BROKER_URL          | URL of the MQTT broker                                                        | Yes       | -           |
-| BROKER_PORT         | Port number of the MQTT broker                                                | Yes       | -           |
-| TOPIC               | MQTT topic to publish messages to                                             | Yes       | -           |
-| QOS                 | Quality of Service level for message delivery                                 | Yes       | -           |
-| NR_OF_MESSAGES      | Number of messages to publish                                                 | Yes       | 5           |
-| PUBLISH_SLEEP_TIME  | Interval between each publish                                                 | Yes       | 5           |
-| TLS_ENABLED         | Determines if the client is configured with TLS                               | Yes       | False       |
-| TESTDATA_PATH       | Path to test data                                                             | No        | ""          |
-| RETAIN              | Determines the retain flag for publish packets                                | No        | False       |
-| RECONNECT_ATTEMPTS  | Determines the amount of reconnect attempts before shutting down              | No        | -1          |
-| RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect  | No        | 1           |
-| RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect  | No        | 120         |
+| Config variable     | Explanation                                                                          | Mandatory | Default     |
+|---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
+| BROKER_URL          | URL of the MQTT broker                                                               | Yes       | -           |
+| BROKER_PORT         | Port number of the MQTT broker                                                       | Yes       | -           |
+| TOPIC               | MQTT topic to publish messages to                                                    | Yes       | -           |
+| QOS                 | Quality of Service level for message delivery                                        | Yes       | -           |
+| NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | 5           |
+| PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
+| TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
+| TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
+| RETAIN              | Determines the retain flag for publish packets                                       | No        | False       |
+| RECONNECT_ATTEMPTS  | Determines the amount of reconnect attempts before shutting down. < 0 means no limit | No        | -1          |
+| RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect         | No        | 1           |
+| RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect         | No        | 120         |
 
 Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. The default configuration, if no input is provided, is the configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml). 
 
