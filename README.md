@@ -11,18 +11,18 @@ Install python packages from requirements.txt:
 python -m pip install -r requirements.txt
 ```
 
-The project reuses MQTT client componets from the [MQTT Connector](https://github.com/smartoceanplatform/mqtt_connector) project, and the current setup expects the MQTT Connector to be in the same parent folder as the virtualuwsn project. 
+The project reuses MQTT client components from the [MQTT Connector](https://github.com/smartoceanplatform/mqtt_connector) project, and the current setup expects the MQTT Connector to be in the same parent folder as the virtualuwsn project. 
 
 
 ## Configuration
-Credentials for the broker is to be placed in a .env file with the following content:
+Broker credentials is to be placed in a .env file with the following content:
 
 | Env variable        | Explanation                                       | Mandatory |
 |---------------------|---------------------------------------------------|-----------|
 | BROKER_USERNAME     | Username for connecting to the MQTT broker        | Yes       |
 | BROKER_PASSWORD     | Password for connecting to the MQTT broker        | Yes       |
 
-The remaining configuration is placed in a .yml file with the following content. 
+The remaining configuration is placed in a .yml file with the following content: 
 
 | Config variable     | Explanation                                                                          | Mandatory | Default     |
 |---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
@@ -33,11 +33,12 @@ The remaining configuration is placed in a .yml file with the following content.
 | NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | 5           |
 | PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
 | TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
+| RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |
+| RECONNECT_ATTEMPTS  | Determines the amount of reconnect attempts before shutting down. < 0 means no limit | Yes       | -1          |
+| RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect         | Yes       | 1           |
+| RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect         | Yes       | 120         |
 | TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
-| RETAIN              | Determines the retain flag for publish packets                                       | No        | False       |
-| RECONNECT_ATTEMPTS  | Determines the amount of reconnect attempts before shutting down. < 0 means no limit | No        | -1          |
-| RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect         | No        | 1           |
-| RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect         | No        | 120         |
+
 
 Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. The default configuration, if no input is provided, is the configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml). 
 
@@ -74,6 +75,6 @@ docker run --env-file virtualuwsn/.env --name aadivuwsn virtualuwsn --configfile
 ```
 
 ### Main script
-Running the main.py script will start the simulation based on the configuration:
+Running the main.py script starts the simulation based on the configuration:
 * If the TESTDATA_PATH is present and valid, the hubnode will be connected to a FileVUWSN that transmits historical data from data files found at the provided path
 * If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean format
