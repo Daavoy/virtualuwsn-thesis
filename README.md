@@ -65,10 +65,11 @@ MQTT broker credentials and configuration are provided as environment variables 
 docker run --env-file <.env_file>  --name <name> <image_name> --configfile <path_to_configfile>
 ```
 
-#### Example:
+#### Examples:
 ```
 docker build -t virtualuwsn:latest -f virtualuwsn/Dockerfile .
-
+```
+```
 docker run --env-file virtualuwsn/.env --name aadivuwsn virtualuwsn --configfile configs/config-aadinode-test.yml
 ```
 
