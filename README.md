@@ -17,10 +17,10 @@ The project reuses MQTT client componets from the [MQTT Connector](https://githu
 ## Configuration
 Credentials for the broker is to be placed in a .env file with the following content:
 
-| Env variable        | Explanation                                       | Mandatory | Default     |
-|---------------------|---------------------------------------------------|-----------|-------------|
-| BROKER_USERNAME     | Username for connecting to the MQTT broker        | Yes       | -           |
-| BROKER_PASSWORD     | Password for connecting to the MQTT broker        | Yes       | -           |
+| Env variable        | Explanation                                       | Mandatory |
+|---------------------|---------------------------------------------------|-----------|
+| BROKER_USERNAME     | Username for connecting to the MQTT broker        | Yes       |
+| BROKER_PASSWORD     | Password for connecting to the MQTT broker        | Yes       |
 
 The remaining configuration is placed in a .yml file with the following content. 
 
@@ -39,7 +39,7 @@ The remaining configuration is placed in a .yml file with the following content.
 | RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect  | No        | 1           |
 | RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect  | No        | 120         |
 
-Configuration .yml files are placed in the */configs* folder, and the data path to a specific configuration file is provided as input to the main script. The default configuration, if no input is provided, is the configuration at *configs/config-broker-evaluation.yml*. 
+Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. The default configuration, if no input is provided, is the configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml). 
 
 The default behaviour of the VUWSN is to generate data in the SmartOcean format. To simulate historic data from files, the TESTDATA_PATH must be set to a specific testdata folder path.
 
@@ -52,7 +52,7 @@ Current testdata includes:
 
 ## Running the project
 ### Running locally
-MQTT broker credentials are to be placed in an `.env` file, while the remaining configuration is provided in the input configuration file. 
+MQTT broker credentials are to be placed in an `.env` file, while the remaining configuration is provided in the .yml configuration file. Running the main.py script starts the simulation. 
 
 ### Running in Docker container
 To create a docker image, use the docker build command with the [Dockerfile](Dockerfile) as input. Since the MQTT Connector needs to be copied in to the container, run the command from the parent folder of both projects. 
