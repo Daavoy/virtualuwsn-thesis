@@ -30,7 +30,7 @@ The remaining configuration is placed in a .yml file with the following content:
 | BROKER_PORT         | Port number of the MQTT broker                                                       | Yes       | -           |
 | TOPIC               | MQTT topic to publish messages to                                                    | Yes       | -           |
 | QOS                 | Quality of Service level for message delivery                                        | Yes       | -           |
-| NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | 5           |
+| NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | -           |
 | PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
 | TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
 | RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |
