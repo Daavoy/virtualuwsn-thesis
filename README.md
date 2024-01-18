@@ -33,7 +33,7 @@ The remaining configuration is placed in a .yml file with the following content:
 | NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | -           |
 | CLEAN_START         | Determines if the client starts with a clean session.                                | Yes       | False       |
 | KEEPALIVE           | Maximum period in seconds between communications with the broker. If no other messages are being exchanged, this controls the rate at which the client will send ping messages to the broker.                                 | Yes       | 120         |
-| SESSION_EXPIRY_INTERVAL  | Session expiry interval for MQTT session in seconds                             | Yes       | 86400       |
+| SESSION_EXPIRY_INTERVAL  | Session expiry interval for MQTT session in seconds                             | Yes       | 3600       |
 | PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
 | TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
 | RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |

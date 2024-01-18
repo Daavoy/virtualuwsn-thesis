@@ -57,7 +57,7 @@ def getVUWSNConfig()->VUWSNConfig:
             QOS = conf['QOS']
             CLEAN_START = conf.get('CLEAN_START', False)
             KEEPALIVE = conf.get('KEEPALIVE', 120)
-            SESSION_EXPIRY_INTERVAL = conf.get('SESSION_EXPIRY_INTERVAL', 86400)
+            SESSION_EXPIRY_INTERVAL = conf.get('SESSION_EXPIRY_INTERVAL', 3600)
             TLS_ENABLED = conf.get('TLS_ENABLED', False)
             RETAIN = conf.get('RETAIN', False)
             RECONNECT_ATTEMPTS = conf.get('RECONNECT_ATTEMPTS', -1)
