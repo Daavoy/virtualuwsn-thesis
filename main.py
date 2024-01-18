@@ -2,7 +2,7 @@ import sys
 import os
 import logging
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.abspath("../"))
 from mqtt_connector.mqtt_client import MQTTPublisher
 
 from gateway import Gateway
@@ -36,8 +36,8 @@ if __name__ == "__main__":
             if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_SLEEP_TIME >= 0:
                 # MQTT setup
                 
-                mqtt_publisher = MQTTPublisher("Publisher", config.BROKER, config.BROKER_PORT, config.TOPIC, config.QOS, config.USERNAME, 
-                                               config.PASSWORD, config.RECONNECT_CONFIG, gateway.logger, config.RETAIN, use_tls=config.TLS_ENABLED)
+                mqtt_publisher = MQTTPublisher("Publisher", config.BROKER_CONFIG, config.CONNECT_CONFIG, config.RECONNECT_CONFIG, 
+                                               gateway.logger, config.RETAIN)
                 gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
             else:
                 print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {config.NR_OF_MESSAGES}, {config.PUBLISH_SLEEP_TIME}")
