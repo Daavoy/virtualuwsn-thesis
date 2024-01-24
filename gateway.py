@@ -23,16 +23,17 @@ class Gateway:
     def log(self, msg: str):
         self.logger.info(msg)
 
-    def run(self, count, sleep_time, publish):
+    def run(self, count, sleep_time, publisher):
         nr_of_failed_transmits = 0  
         hub_idx = 0
-        time.sleep(10) # wait before starting simulation
+        time.sleep(sleep_time) # wait before starting simulation
+        #publisher.run() # start publisher
 
         for i in range(1, count+1):
             hub = self.hubs[hub_idx]
             data = hub.transmit()
 
-            if publish:
+            if publisher.do_continue:
                 # Add properties for analytics
                 data_to_hash = f"{i}{time.time()}"
                 id = hashlib.sha256(data_to_hash.encode()).hexdigest()
@@ -40,7 +41,7 @@ class Gateway:
                 publish_properties.UserProperty = ("unique_message_id", str(id)) 
                 publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
 
-                if publish(data, publish_properties):
+                if publisher.publish(data, publish_properties):
                     self.log(f'Hub ({hub.description}) - transmitted data')
                 else:
                     self.log(f'Hub ({hub.description}) - failed to transmit data')
@@ -54,6 +55,7 @@ class Gateway:
             time.sleep(sleep_time)
 
         self.log(f'Gateway finished transmitting data. Transmitted {count - nr_of_failed_transmits}/{count} messages')
+        publisher.stop()
 
     # TODO: Add method to add/remove hubs to gateway?
 

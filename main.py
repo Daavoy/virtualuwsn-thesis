@@ -35,10 +35,9 @@ if __name__ == "__main__":
         if gateway is not None:
             if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_SLEEP_TIME >= 0:
                 # MQTT setup
-                
-                mqtt_publisher = MQTTPublisher("Publisher", config.BROKER_CONFIG, config.CONNECT_CONFIG, config.RECONNECT_CONFIG, 
+                mqtt_publisher = MQTTPublisher("Publisher", config.BROKER_CONFIG, config.CONNECT_CONFIG, config.REATTEMPT_CONFIG, 
                                                gateway.logger, config.RETAIN)
-                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_SLEEP_TIME, mqtt_publisher.publish)
+                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_SLEEP_TIME, mqtt_publisher)
             else:
                 print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {config.NR_OF_MESSAGES}, {config.PUBLISH_SLEEP_TIME}")
         else:

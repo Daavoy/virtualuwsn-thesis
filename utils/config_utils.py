@@ -5,17 +5,17 @@ import yaml
 import sys
 
 sys.path.append(os.path.abspath("../"))
-from mqtt_connector.mqtt_client import BrokerConfig, ConnectConfig, ReconnectConfig
+from mqtt_connector.mqtt_client import BrokerConfig, ConnectConfig, ReattemptConfig
 
 class VUWSNConfigurationException(Exception):
     pass
 
 class VUWSNConfig:
-        def __init__(self, broker_config:BrokerConfig, connect_config:ConnectConfig, reconnect_config:ReconnectConfig, retain_flag:bool, 
+        def __init__(self, broker_config:BrokerConfig, connect_config:ConnectConfig, reattempt_config:ReattemptConfig, retain_flag:bool, 
                      nr_of_messages:int, publish_sleep_time:int, data_path:str=None):
             self.BROKER_CONFIG = broker_config
             self.CONNECT_CONFIG = connect_config
-            self.RECONNECT_CONFIG = reconnect_config
+            self.REATTEMPT_CONFIG = reattempt_config
             self.RETAIN = retain_flag
             self.TESTDATA_PATH = data_path
             self.NR_OF_MESSAGES = nr_of_messages
@@ -60,9 +60,9 @@ def getVUWSNConfig()->VUWSNConfig:
             SESSION_EXPIRY_INTERVAL = conf.get('SESSION_EXPIRY_INTERVAL', 3600)
             TLS_ENABLED = conf.get('TLS_ENABLED', False)
             RETAIN = conf.get('RETAIN', False)
-            RECONNECT_ATTEMPTS = conf.get('RECONNECT_ATTEMPTS', -1)
-            RECONNECT_MIN_DELAY = conf.get('RECONNECT_MIN_DELAY', 1)
-            RECONNECT_MAX_DELAY = conf.get('RECONNECT_MAX_DELAY', 120)
+            REATTEMPTS = conf.get('REATTEMPTS', 5)
+            REATTEMPT_MIN_DELAY = conf.get('REATTEMPT_MIN_DELAY', 2)
+            REATTEMPT_MAX_DELAY = conf.get('REATTEMPT_MAX_DELAY', 3600)
             NR_OF_MESSAGES = conf.get('NR_OF_MESSAGES')
             PUBLISH_SLEEP_TIME = conf.get('PUBLISH_SLEEP_TIME', 5)
             TESTDATA_PATH = conf.get("TESTDATA_PATH", "").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
@@ -71,9 +71,9 @@ def getVUWSNConfig()->VUWSNConfig:
 
     connect_config = ConnectConfig(use_tls=TLS_ENABLED, clean_start=CLEAN_START, keepalive=KEEPALIVE, 
                                    session_expiry_interval=SESSION_EXPIRY_INTERVAL)
-    reconnect_config = ReconnectConfig(RECONNECT_ATTEMPTS, RECONNECT_MIN_DELAY, RECONNECT_MAX_DELAY)
+    reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
     
-    return VUWSNConfig(broker_config, connect_config, reconnect_config, RETAIN, NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, TESTDATA_PATH)
+    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, TESTDATA_PATH)
     
 

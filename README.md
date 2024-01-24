@@ -37,9 +37,9 @@ The remaining configuration is placed in a .yml file with the following content:
 | PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
 | TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
 | RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |
-| RECONNECT_ATTEMPTS  | Determines the amount of reconnect attempts before shutting down. < 0 means no limit | Yes       | -1          |
-| RECONNECT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reconnect         | Yes       | 1           |
-| RECONNECT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reconnect         | Yes       | 120         |
+| REATTEMPTS  | Determines the amount of connect attempts before shutting down. < 0 means no limit | Yes       | -1          |
+| REATTEMPT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reattempt connect         | Yes       | 1           |
+| REATTEMPT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reattempt connect        | Yes       | 120         |
 | TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
 
 
