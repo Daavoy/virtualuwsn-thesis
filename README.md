@@ -5,6 +5,27 @@ The data can be simulated in various ways:
 * Custom generated data in SmartOcean format
 
 ## Setup
+### Getting the source code
+
+Clone the git repository
+
+```
+git clone https://github.com/smartoceanplatform/virtualuwsn.git
+```
+
+The repository uses git submodules to include the [smartocean data model](https://github.com/smartoceanplatform/datamodels). The data model submodule can be fetched using:
+
+```
+git submodule update --init --recursive
+```
+
+If there is a need to later update the data models based on the submodule repository use:
+
+```
+ git submodule update --remote
+```
+
+### Python packages
 Install python packages from requirements.txt:
 
 ```
@@ -15,7 +36,7 @@ The project reuses MQTT client components from the [MQTT Connector](https://gith
 
 
 ## Configuration
-Broker credentials is to be placed in a .env file with the following content:
+Broker credentials are to be placed in a .env file with the following content:
 
 | Env variable        | Explanation                                       | Mandatory |
 |---------------------|---------------------------------------------------|-----------|
@@ -43,7 +64,7 @@ The remaining configuration is placed in a .yml file with the following content:
 | TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
 
 
-Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. The default configuration, if no input is provided, is the configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml). 
+Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. If no input is provided, the default configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml) is used. 
 
 The default behaviour of the VUWSN is to generate data in the SmartOcean format. To simulate historic data from files, the TESTDATA_PATH must be set to a specific testdata folder path.
 
@@ -55,16 +76,23 @@ Current testdata includes:
 * wsense/valid_data (sample of valid WSense data)
 
 ## Running the project
-### Running locally
-MQTT broker credentials are to be placed in an `.env` file, while the remaining configuration is provided in the .yml configuration file. Running the main.py script starts the simulation. 
+### Main script
+Running the main.py script starts the simulation based on the configuration:
+* If the TESTDATA_PATH is present and valid, the hubnode will be connected to a FileVUWSN that transmits historical data from data files found at the provided path. An exception is thrown if no files are found at the TESTDATA_PATH.
+* If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean V0 format
 
+### Running locally
+MQTT broker credentials are to be placed in a `.env` file, while the remaining configuration is provided in the input .yml configuration file. Running the main.py script starts the simulation. 
+```
+python main.py --configfile <path_to_configfile>
+```
 ### Running in Docker container
-To create a docker image, use the docker build command with the [Dockerfile](Dockerfile) as input. Since the MQTT Connector needs to be copied in to the container, run the command from the parent folder of both projects. 
+To create a docker image, use the docker build command with the [Dockerfile](Dockerfile) as input. Since the MQTT Connector needs to be copied to the container, run the command from the parent folder of both projects. 
 ```
 docker build -t <image_name>:<tag> -f Dockerfile .
 ```
 
-MQTT broker credentials and configuration are provided as environment variables and input argument to the container, e.g. by providing an .env file and configuration file when running the container:
+MQTT broker credentials and configuration are provided as environment variables and input arguments to the container, e.g. by providing a .env file and configuration file when running the container:
 ```
 docker run --env-file <.env_file>  --name <name> <image_name> --configfile <path_to_configfile>
 ```
@@ -77,7 +105,3 @@ docker build -t virtualuwsn:latest -f virtualuwsn/Dockerfile .
 docker run --env-file virtualuwsn/.env --name aadivuwsn virtualuwsn --configfile configs/config-aadinode-test.yml
 ```
 
-### Main script
-Running the main.py script starts the simulation based on the configuration:
-* If the TESTDATA_PATH is present and valid, the hubnode will be connected to a FileVUWSN that transmits historical data from data files found at the provided path
-* If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean format
