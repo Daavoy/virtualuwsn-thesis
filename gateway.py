@@ -10,7 +10,7 @@ class Gateway:
         self.name = name
         self.hubs = sensorhubs
 
-        # Setup publisher logging
+        # Setup logging
         self.logger = getFileHandler("logs/gateway")
 
         self.log(self.__str__())
@@ -27,7 +27,6 @@ class Gateway:
         nr_of_failed_transmits = 0  
         hub_idx = 0
         time.sleep(sleep_time) # wait before starting simulation
-        #publisher.run() # start publisher
 
         for i in range(1, count+1):
             hub = self.hubs[hub_idx]
