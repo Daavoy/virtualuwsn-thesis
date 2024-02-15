@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath("../"))
 from mqtt_connector.mqtt_client import MQTTPublisher
 
 from gateway import Gateway
-from datamodels.timeseriesdata import Location
+from datamodels.tsdatamodel.timeseriesdata import Location
 from hubnode import HubNode
 from vuwsn import *
 from utils.config_utils import *

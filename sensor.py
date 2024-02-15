@@ -1,7 +1,7 @@
 import math
 import time
 
-from datamodels.timeseriesdata import *
+from datamodels.tsdatamodel.timeseriesdata import *
 
 from abc import abstractmethod
 
