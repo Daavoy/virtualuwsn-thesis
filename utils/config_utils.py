@@ -10,9 +10,20 @@ from mqtt_connector.mqtt_client import BrokerConfig, ConnectConfig, ReattemptCon
 class VUWSNConfigurationException(Exception):
     pass
 
+class SmartOceanDataConfig:
+    def __init__(self, description: str, timeseries: str, source: str, source_id: str, latitude: float, longitude: float,
+                 format: str):
+        self.DESCRIPTION = description
+        self.TIMESERIES = timeseries
+        self.SOURCE = source
+        self.SOURCE_ID = source_id
+        self.LOCATION_LATITUDE = latitude
+        self.LOCATION_LONGITUDE = longitude
+        self.FORMAT = format
+
 class VUWSNConfig:
         def __init__(self, broker_config:BrokerConfig, connect_config:ConnectConfig, reattempt_config:ReattemptConfig, retain_flag:bool, 
-                     nr_of_messages:int, publish_sleep_time:int, data_path:str=None):
+                     nr_of_messages:int, publish_sleep_time:int, data_path:str=None, so_data_config:SmartOceanDataConfig=None):
             self.BROKER_CONFIG = broker_config
             self.CONNECT_CONFIG = connect_config
             self.REATTEMPT_CONFIG = reattempt_config
@@ -20,6 +31,7 @@ class VUWSNConfig:
             self.TESTDATA_PATH = data_path
             self.NR_OF_MESSAGES = nr_of_messages
             self.PUBLISH_SLEEP_TIME = publish_sleep_time
+            self.SMARTOCEAN_DATA_CONFIG = so_data_config
 
 
 def getVUWSNConfig()->VUWSNConfig:
@@ -66,6 +78,19 @@ def getVUWSNConfig()->VUWSNConfig:
             NR_OF_MESSAGES = conf.get('NR_OF_MESSAGES')
             PUBLISH_SLEEP_TIME = conf.get('PUBLISH_SLEEP_TIME', 5)
             TESTDATA_PATH = conf.get("TESTDATA_PATH", "").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
+
+            so_data_config = None
+            if TESTDATA_PATH is None or TESTDATA_PATH == "":
+                # Load SmartOcean data configuration
+                DESCRIPTION = conf.get('DESCRIPTION', "SmartOcean VUWSN Sensor Hub Timeseries")
+                TIMESERIES = conf.get('TIMESERIES', "SmartOceanVUWSN:0001")
+                SOURCE = conf.get('SOURCE', 'SmartOcean VUWSN Sensor Hub')
+                SOURCE_ID = conf.get('SOURCE_ID', '0001')
+                LATITUDE = conf.get('LOCATION_LATITUDE', 60.0)
+                LONGITUDE = conf.get('LOCATION_LONGITUDE', 5.5)
+                FORMAT = conf.get('FORMAT', "SMARTOCEAN_V1")
+                so_data_config = SmartOceanDataConfig(DESCRIPTION, TIMESERIES, SOURCE, SOURCE_ID, LATITUDE, LONGITUDE, FORMAT)
+
     except Exception as e:
         raise VUWSNConfigurationException(f"Error when reading from config file: {e}")
 
@@ -74,6 +99,7 @@ def getVUWSNConfig()->VUWSNConfig:
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
     
-    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, TESTDATA_PATH)
+    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, 
+                       TESTDATA_PATH, so_data_config)
     
 

@@ -13,26 +13,37 @@ class VUWSN:
 
 class SmartOceanVUWSN(VUWSN):
 
-    def __init__(self, description: str, origin: str, timeseries: str, location: Location, sensors: List[Sensor]):
+    def __init__(self, description: str, format: str,
+                 origin: str, timeseries: str,
+                 source: str, source_id: str,
+                 location: Location, sensors: List[Sensor]):
         super().__init__(description)
+        self.format = format
         self.origin = origin
         self.timeseries = timeseries
+        self.source = source
+        self.source_id = source_id
         self.location = location
         self.sensors = sensors
+        self.dp_id_count = 1
 
     def generate_datapoint(self) -> DataPoint:
         obs = [sensor.read() for sensor in self.sensors]
         time_now = datetime.datetime.now()
         time_now_local = time_now.astimezone()
 
-        data_point = DataPoint(location=self.location,
-                               time=time_now_local,
+        data_point = DataPoint(dp_id=str(self.dp_id_count),
+                               source=self.source,
+                               source_id=self.source_id,
+                               location=self.location,
+                               time=datetime.datetime.isoformat(time_now_local),
                                observations=obs)
+        
+        self.dp_id_count = self.dp_id_count + 1
 
         return data_point
 
     def generate_timeseries_data(self) -> TimeSeriesData:
-        SMARTOCEAN_FORMAT = "SMARTOCEAN_V0"
         data_point = self.generate_datapoint()
         data_points = [data_point]
 
@@ -40,7 +51,7 @@ class SmartOceanVUWSN(VUWSN):
                              timeseries=self.timeseries,
                              origin=self.origin)
 
-        ts_data = TimeSeriesData(format=SMARTOCEAN_FORMAT, metadata=meta_data,
+        ts_data = TimeSeriesData(format=self.format, metadata=meta_data,
                                  datapoints=data_points, data=data_points)
 
         return ts_data
@@ -54,14 +65,16 @@ class SmartOceanVUWSN(VUWSN):
     
 class TempCondBattVUWSN(SmartOceanVUWSN):
 
-    def __init__(self, name:str, location: Location):
+    def __init__(self, description: str, format: str,
+                 origin: str, timeseries: str,
+                 source: str, source_id: str,
+                 location: Location):
         temp_sensor = TemperatureSensor("Virtual Temperature Sensor")
         cond_sensor = ConductivitySensor("Virtual Conductivity Sensor")
         batt_sensor = BatterySensor("Virtual Battery Sensor")
 
-        super().__init__(description=name, timeseries=name,
-                         origin=name, location=location,
-                         sensors=[temp_sensor, cond_sensor, batt_sensor])
+        super().__init__(description=description, timeseries=timeseries, format=format, source=source, source_id=source_id,
+                         origin=origin, location=location,sensors=[temp_sensor, cond_sensor, batt_sensor])
 
 class FileVUWSN(VUWSN):
 
