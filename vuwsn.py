@@ -1,4 +1,4 @@
-from datamodels.timeseriesdata import *
+from datamodels.tsdatamodel.timeseriesdata import *
 from sensor import *
 from abc import abstractmethod
 import os
