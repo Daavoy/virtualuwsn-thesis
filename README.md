@@ -43,7 +43,7 @@ Broker credentials are to be placed in a .env file with the following content:
 | BROKER_USERNAME     | Username for connecting to the MQTT broker        | Yes       |
 | BROKER_PASSWORD     | Password for connecting to the MQTT broker        | Yes       |
 
-The remaining configuration is placed in a .yml file with the following content: 
+The remaining configuration is placed in a `.yml` file with the following content: 
 
 | Config variable     | Explanation                                                                          | Mandatory | Default     |
 |---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
@@ -54,15 +54,27 @@ The remaining configuration is placed in a .yml file with the following content:
 | NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | -           |
 | CLEAN_START         | Determines if the client starts with a clean session.                                | Yes       | False       |
 | KEEPALIVE           | Maximum period in seconds between communications with the broker. If no other messages are being exchanged, this controls the rate at which the client will send ping messages to the broker.                                 | Yes       | 120         |
-| SESSION_EXPIRY_INTERVAL  | Session expiry interval for MQTT session in seconds                             | Yes       | 3600       |
+| SESSION_EXPIRY_INTERVAL  | Session expiry interval for MQTT session in seconds                             | Yes       | 3600        |
 | PUBLISH_SLEEP_TIME  | Interval between each publish                                                        | Yes       | 5           |
 | TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
 | RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |
-| REATTEMPTS  | Determines the amount of connect attempts before shutting down. < 0 means no limit | Yes       | 5         |
-| REATTEMPT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reattempt connect         | Yes       | 2           |
-| REATTEMPT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reattempt connect        | Yes       | 3600         |
+| REATTEMPTS  | Determines the amount of connect attempts before shutting down. < 0 means no limit           | Yes       | 5           |
+| REATTEMPT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reattempt connect | Yes       | 2           |
+| REATTEMPT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reattempt connect | Yes       | 3600        |
 | TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
 
+The generation of data in the SmartOcean format can be configured by adding the following content to the `.yml` file. 
+| Config variable     | Explanation                                                                          | Mandatory | Default     |
+|---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
+| DESCRIPTION         | Descriptive name of the time series                                                  | No        | "SmartOcean VUWSN Sensor Hub Timeseries"          |
+| TIMESERIES          | Unique time series identification                                                    | No        | "SmartOceanVUWSN:0001"           |
+| SOURCE              | Description of data point source                                                     | No        | "SmartOcean VUWSN Sensor Hub"           |
+| SOURCE_ID           | Unique identification of data point source (sensor hub)                              | No        | "0001"      |
+| LOCATION_LATITUDE   | Latitude of the data point                                                           | No        | 60.0        |
+| LOCATION_LONGITUDE  | Longitude of the data point                                                          | No        | 5.5         |
+| FORMAT              | Identification of format (SMARTOCEAN_Vx)                                             | No        | "SMARTOCEAN_V1" |
+
+The current virtual generation only supports the SmartOcean format V1.
 
 Configuration .yml files are placed in the [configs](configs) folder, and the data path to a specific configuration file is provided as input to the main script. If no input is provided, the default configuration at [configs/config-broker-evaluation.yml](configs/config-broker-evaluation.yml) is used. 
 
@@ -79,7 +91,7 @@ Current testdata includes:
 ### Main script
 Running the main.py script starts the simulation based on the configuration:
 * If the TESTDATA_PATH is present and valid, the hubnode will be connected to a FileVUWSN that transmits historical data from data files found at the provided path. An exception is thrown if no files are found at the TESTDATA_PATH.
-* If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean V0 format
+* If not a TempCondBattVUWSN (consisting of a temperature, a conductivity and a battery sensor) transmits generated data in the SmartOcean V1 format
 
 ### Running locally
 MQTT broker credentials are to be placed in a `.env` file, while the remaining configuration is provided in the input .yml configuration file. Running the main.py script starts the simulation. 

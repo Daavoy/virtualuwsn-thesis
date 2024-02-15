@@ -2,6 +2,7 @@ from datamodels.tsdatamodel.timeseriesdata import *
 from sensor import *
 from abc import abstractmethod
 import os
+from datetime import datetime
 
 class VUWSN: 
     def __init__(self, description: str):
@@ -29,14 +30,14 @@ class SmartOceanVUWSN(VUWSN):
 
     def generate_datapoint(self) -> DataPoint:
         obs = [sensor.read() for sensor in self.sensors]
-        time_now = datetime.datetime.now()
+        time_now = datetime.now()
         time_now_local = time_now.astimezone()
 
         data_point = DataPoint(dp_id=str(self.dp_id_count),
                                source=self.source,
                                source_id=self.source_id,
                                location=self.location,
-                               time=datetime.datetime.isoformat(time_now_local),
+                               time=datetime.isoformat(time_now_local),
                                observations=obs)
         
         self.dp_id_count = self.dp_id_count + 1
