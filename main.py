@@ -21,13 +21,11 @@ if __name__ == "__main__":
 
         if config.TESTDATA_PATH is None or config.TESTDATA_PATH == "":
             sdc = config.SMARTOCEAN_DATA_CONFIG
-            if(sdc is not None):
-                location = Location(latitude=sdc.LOCATION_LATITUDE, 
-                                    longitude=sdc.LOCATION_LONGITUDE)
-                vuwsn = TempCondBattVUWSN(description=sdc.DESCRIPTION,format=sdc.FORMAT, origin=sdc.ORIGIN,,
-                                          timeseries=sdc.TIMESERIES, source=sdc.SOURCE, source_id=sdc.SOURCE_ID,
-                                            location=sdc location)
-                node = HubNode(sdc.DESCRIPTION, sdc.ORIGIN, vuwsn)
+            if sdc is not None:
+                location = Location(latitude=sdc.LOCATION_LATITUDE, longitude=sdc.LOCATION_LONGITUDE)
+                vuwsn = TempCondBattVUWSN(description=sdc.DESCRIPTION,format=sdc.FORMAT, origin=sdc.TIMESERIES, timeseries=sdc.TIMESERIES, 
+                                          source=sdc.SOURCE, source_id=sdc.SOURCE_ID, location=location)
+                node = HubNode(sdc.DESCRIPTION, sdc.TIMESERIES, vuwsn)
                 gateway = Gateway("Virtual SmartOcean Gateway", [node])
             else:
                 print("Error: No test data path or SmartOcean data configuration found")

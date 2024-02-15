@@ -69,9 +69,9 @@ class TempCondBattVUWSN(SmartOceanVUWSN):
                  origin: str, timeseries: str,
                  source: str, source_id: str,
                  location: Location):
-        temp_sensor = TemperatureSensor("Virtual Temperature Sensor")
-        cond_sensor = ConductivitySensor("Virtual Conductivity Sensor")
-        batt_sensor = BatterySensor("Virtual Battery Sensor")
+        temp_sensor = TemperatureSensor("Virtual Temperature Sensor", "0001")
+        cond_sensor = ConductivitySensor("Virtual Conductivity Sensor", "0002")
+        batt_sensor = BatterySensor("Virtual Battery Sensor", "0003")
 
         super().__init__(description=description, timeseries=timeseries, format=format, source=source, source_id=source_id,
                          origin=origin, location=location,sensors=[temp_sensor, cond_sensor, batt_sensor])
