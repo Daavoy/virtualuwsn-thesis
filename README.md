@@ -64,6 +64,7 @@ The remaining configuration is placed in a `.yml` file with the following conten
 | TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
 
 The generation of data in the SmartOcean format can be configured by adding the following content to the `.yml` file. 
+
 | Config variable     | Explanation                                                                          | Mandatory | Default     |
 |---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
 | DESCRIPTION         | Descriptive name of the time series                                                  | No        | "SmartOcean VUWSN Sensor Hub Timeseries"          |
