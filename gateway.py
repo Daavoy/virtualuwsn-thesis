@@ -23,10 +23,10 @@ class Gateway:
     def log(self, msg: str):
         self.logger.info(msg)
 
-    def run(self, count, sleep_time, publisher):
+    def run(self, count, publish_interval, publisher):
         nr_of_failed_transmits = 0  
         hub_idx = 0
-        time.sleep(sleep_time) # wait before starting simulation
+        time.sleep(2) # wait before starting simulation
 
         for i in range(1, count+1):
             hub = self.hubs[hub_idx]
@@ -51,7 +51,7 @@ class Gateway:
 
             hub_idx = (hub_idx + 1) % len(self.hubs)
 
-            time.sleep(sleep_time)
+            time.sleep(publish_interval)
 
         self.log(f'Gateway finished transmitting data. Transmitted {count - nr_of_failed_transmits}/{count} messages')
         publisher.stop()

@@ -38,13 +38,13 @@ if __name__ == "__main__":
             gateway = Gateway(f"Virtual Data File Gateway {config.TESTDATA_PATH}", [node])
         
         if gateway is not None:
-            if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_SLEEP_TIME >= 0:
+            if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
                 # MQTT setup
                 mqtt_publisher = MQTTPublisher("Publisher", config.BROKER_CONFIG, config.CONNECT_CONFIG, config.REATTEMPT_CONFIG, 
                                                gateway.logger, config.RETAIN)
-                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_SLEEP_TIME, mqtt_publisher)
+                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_INTERVAL, mqtt_publisher)
             else:
-                print(f"Invalid NR_OF_MESSAGES or PUBLISH_SLEEP_TIME: {config.NR_OF_MESSAGES}, {config.PUBLISH_SLEEP_TIME}")
+                print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")
         else:
             # log error
             print("Error: Gateway was not configured correctly")

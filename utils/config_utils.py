@@ -23,14 +23,14 @@ class SmartOceanDataConfig:
 
 class VUWSNConfig:
         def __init__(self, broker_config:BrokerConfig, connect_config:ConnectConfig, reattempt_config:ReattemptConfig, retain_flag:bool, 
-                     nr_of_messages:int, publish_sleep_time:int, data_path:str=None, so_data_config:SmartOceanDataConfig=None):
+                     nr_of_messages:int, publish_interval:int, data_path:str=None, so_data_config:SmartOceanDataConfig=None):
             self.BROKER_CONFIG = broker_config
             self.CONNECT_CONFIG = connect_config
             self.REATTEMPT_CONFIG = reattempt_config
             self.RETAIN = retain_flag
             self.TESTDATA_PATH = data_path
             self.NR_OF_MESSAGES = nr_of_messages
-            self.PUBLISH_SLEEP_TIME = publish_sleep_time
+            self.PUBLISH_INTERVAL = publish_interval
             self.SMARTOCEAN_DATA_CONFIG = so_data_config
 
 
@@ -76,7 +76,7 @@ def getVUWSNConfig()->VUWSNConfig:
             REATTEMPT_MIN_DELAY = conf.get('REATTEMPT_MIN_DELAY', 2)
             REATTEMPT_MAX_DELAY = conf.get('REATTEMPT_MAX_DELAY', 3600)
             NR_OF_MESSAGES = conf.get('NR_OF_MESSAGES')
-            PUBLISH_SLEEP_TIME = conf.get('PUBLISH_SLEEP_TIME', 5)
+            PUBLISH_INTERVAL = conf.get('PUBLISH_INTERVAL', 5)
             TESTDATA_PATH = conf.get("TESTDATA_PATH", "").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
 
             so_data_config = None
@@ -99,7 +99,7 @@ def getVUWSNConfig()->VUWSNConfig:
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
     
-    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_SLEEP_TIME, 
+    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_INTERVAL, 
                        TESTDATA_PATH, so_data_config)
     
 
