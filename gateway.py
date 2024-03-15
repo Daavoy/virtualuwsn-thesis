@@ -27,6 +27,7 @@ class Gateway:
         nr_of_failed_transmits = 0  
         hub_idx = 0
         time.sleep(2) # wait before starting simulation
+        self.log(f"Starting publishing {count} messages with {publish_interval} second intervals")
 
         for i in range(1, count+1):
             hub = self.hubs[hub_idx]
