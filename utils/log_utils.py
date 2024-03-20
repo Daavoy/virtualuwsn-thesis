@@ -14,7 +14,7 @@ def getTimedRotatingFileHandler(name, logfile):
     return logger
 
 def getFileHandler(name):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
     log_filename = f"{name}.{timestamp}.log"
     formatter = logging.Formatter(fmt='%(asctime)s[%(levelname)s]:%(message)s', datefmt="%H:%M:%S")
     logger = logging.getLogger(log_filename)
