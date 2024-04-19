@@ -2,8 +2,7 @@ import sys
 import os
 import logging
 
-sys.path.append(os.path.abspath("../"))
-from mqtt_connector.mqtt_client import MQTTPublisher
+from mqtt_connector.mqtt.client import MQTTPublisher
 
 from gateway import Gateway
 from datamodels.tsdatamodel.timeseriesdata import Location

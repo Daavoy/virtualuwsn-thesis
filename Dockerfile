@@ -17,8 +17,8 @@ COPY  virtualuwsn /app
 # Copy mqtt_connector from the parent folder to the /app folder
 COPY mqtt_connector /app/mqtt_connector
 
-# Add the datamodels folder to the PYTHONPATH
-ENV PYTHONPATH=/app/datamodels/:$PYTHONPATH
+# Add the datamodels and mqtt_connector folder to the PYTHONPATH
+ENV PYTHONPATH=/app/datamodels/:/app/mqtt_connector/:$PYTHONPATH
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers

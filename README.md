@@ -35,16 +35,16 @@ python -m pip install -r requirements.txt
 The project reuses MQTT client components from the [MQTT Connector](https://github.com/smartoceanplatform/mqtt_connector) project, and the current setup expects the MQTT Connector to be in the same parent folder as the virtualuwsn project. 
 
 ### Python path
-For the virtualuwsn to execute the `PYTHONPATH` must include the path to the datamodels submodule:
+For the virtualuwsn to execute the `PYTHONPATH` must include the path to the datamodels submodule and the mqtt_connector project:
 
 #### Unix
 ```
-export PYTHONPATH=<path>/virtualuwsn/datamodels/
+export PYTHONPATH=<path>/virtualuwsn/datamodels/;<path>/mqtt_connector/
 ```
 
 #### Windows PowerShell
 ```
-$Env:PYTHONPATH = <path>/virtualuwsn/datamodels/
+$Env:PYTHONPATH = <path>/virtualuwsn/datamodels/;<path>/mqtt_connector/
 ```
 
 ## Configuration

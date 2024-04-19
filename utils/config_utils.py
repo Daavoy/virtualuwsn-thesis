@@ -5,7 +5,7 @@ import yaml
 import sys
 
 sys.path.append(os.path.abspath("../"))
-from mqtt_connector.mqtt_client import BrokerConfig, ConnectConfig, ReattemptConfig
+from mqtt_connector.mqtt.configs import BrokerConfig, ConnectConfig, ReattemptConfig
 
 class VUWSNConfigurationException(Exception):
     pass
