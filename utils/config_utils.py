@@ -4,8 +4,7 @@ from decouple import config
 import yaml
 import sys
 
-sys.path.append(os.path.abspath("../"))
-from mqtt_connector.mqtt.configs import BrokerConfig, ConnectConfig, ReattemptConfig
+from mqtt_connector.mqtt.configs import BrokerConfig, ConnectConfig, ReattemptConfig, MQTTClientConfig
 
 class VUWSNConfigurationException(Exception):
     pass
@@ -22,12 +21,9 @@ class SmartOceanDataConfig:
         self.FORMAT = format
 
 class VUWSNConfig:
-        def __init__(self, broker_config:BrokerConfig, connect_config:ConnectConfig, reattempt_config:ReattemptConfig, retain_flag:bool, 
-                     nr_of_messages:int, publish_interval:int, data_path:str=None, so_data_config:SmartOceanDataConfig=None):
-            self.BROKER_CONFIG = broker_config
-            self.CONNECT_CONFIG = connect_config
-            self.REATTEMPT_CONFIG = reattempt_config
-            self.RETAIN = retain_flag
+        def __init__(self, mqtt_config:MQTTClientConfig, nr_of_messages:int, publish_interval:int, data_path:str=None,
+                     so_data_config:SmartOceanDataConfig=None):
+            self.MQTT_CONFIG = mqtt_config
             self.TESTDATA_PATH = data_path
             self.NR_OF_MESSAGES = nr_of_messages
             self.PUBLISH_INTERVAL = publish_interval
@@ -98,8 +94,9 @@ def getVUWSNConfig()->VUWSNConfig:
                                    session_expiry_interval=SESSION_EXPIRY_INTERVAL)
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
+
+    mqtt_config = MQTTClientConfig(broker_config, connect_config, reattempt_config, RETAIN)
     
-    return VUWSNConfig(broker_config, connect_config, reattempt_config, RETAIN, NR_OF_MESSAGES, PUBLISH_INTERVAL, 
-                       TESTDATA_PATH, so_data_config)
+    return VUWSNConfig(mqtt_config, NR_OF_MESSAGES, PUBLISH_INTERVAL, TESTDATA_PATH, so_data_config)
     
 
