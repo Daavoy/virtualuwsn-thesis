@@ -35,7 +35,7 @@ class Gateway:
 
             if publisher.do_continue:
                 # Add properties for analytics
-                data_to_hash = f"{i}{time.time()}"
+                data_to_hash = f"{i}{time.time()}{data}"
                 id = hashlib.sha256(data_to_hash.encode()).hexdigest()
                 publish_properties = Properties(PacketTypes.PUBLISH) 
                 publish_properties.UserProperty = ("unique_message_id", str(id)) 
