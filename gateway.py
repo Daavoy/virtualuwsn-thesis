@@ -1,3 +1,4 @@
+import uuid
 from hubnode import *
 import time
 import hashlib
@@ -35,8 +36,11 @@ class Gateway:
 
             if publisher.do_continue:
                 # Add properties for analytics
-                data_to_hash = f"{i}{time.time()}{data}"
+                pid = os.getpid()
+                random_uuid = uuid.uuid4()
+                data_to_hash = f"{i}{time.time()}{data}{pid}{random_uuid}"
                 id = hashlib.sha256(data_to_hash.encode()).hexdigest()
+
                 publish_properties = Properties(PacketTypes.PUBLISH) 
                 publish_properties.UserProperty = ("unique_message_id", str(id)) 
                 publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
