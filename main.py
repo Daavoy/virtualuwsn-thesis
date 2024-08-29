@@ -1,3 +1,4 @@
+import argparse
 import sys
 import os
 import logging
@@ -12,8 +13,17 @@ from utils.config_utils import *
 
 if __name__ == "__main__":
     try:
+        parser = argparse.ArgumentParser(description="Provide the log file name")
+
+        # Get VUWSN config
+        parser.add_argument("--configfile", default="configs/config-broker-evaluation.yml",
+                            help="Path to the config file")
+        args = parser.parse_args()
+
+        if not os.path.exists(args.configfile):
+            raise RuntimeError(f"Error: The configfile '{args.configfile}' does not exist.")
         # Get VUWSN config   
-        config = getVUWSNConfig()
+        config = getVUWSNConfig(args.configfile)
 
         # VUWSN setup
         gateway = None

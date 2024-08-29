@@ -1,16 +1,20 @@
 import argparse
 import logging
+import os
 import time
 
 import paho.mqtt.client as mqtt
+from paho.mqtt.enums import MQTTProtocolVersion
 
 from utils.config_utils import getVUWSNConfig
 from logging.handlers import TimedRotatingFileHandler
 
+global sub
+
 
 class Subscriber:
 
-    def __init__(self, logfile, addr, port, topic, keep_alive,clean=False,tls=False):
+    def __init__(self, logfile, addr, port, topic, qos, keep_alive,clean=False,tls=False,topics=0):
         self.topic = topic
         self.addr = addr
         self.port = port
@@ -18,60 +22,99 @@ class Subscriber:
         self.tls = tls
         self.clean_sesh = clean
         self.logfile = logfile
+        self.qos = qos
+        self.ntopics=topics
 
         # setup logging
         formatter = logging.Formatter(fmt='%(asctime)s[%(levelname)s],%(message)s', datefmt="%Y-%m-%dT%H:%M:%S%z")
-        self.logger = logging.getLogger("latency-Log")
+        self.logger = logging.getLogger("Exec-Log")
         self.logger.setLevel(logging.INFO)
 
-        handler = TimedRotatingFileHandler(logfile, when="m", interval=30, backupCount=5)
+        handler = TimedRotatingFileHandler(logfile, when="m", interval=60, backupCount=100)
 
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
-    def log(self,mid,send,recv,topic):
-        msg = ','.join((mid,send,recv,topic))
+    def log(self,mid,send,recv,topic,size):
+        msg = ','.join((mid,str(send),str(recv),topic,str(size)))
         self.logger.info(msg)
 
-    def on_connect(self, client, userdata, flags, rc):
-        print(f"Connected with result code {rc}")
-        client.subscribe(self.topic)
 
-    def on_message(self, client, userdata, msg):
-        print(f"Received message: {msg.topic} -> {msg.payload.decode('utf-8')}")
-        mid = userdata['unique_message_id']
-        send_time = userdata['publisher_send_time']
-        recv_time = time.time() * 1000;  # convert to ms
-        self.log(mid,send_time,recv_time,msg.topic)
+def on_connect(client, userdata, flags, reason_code, properties):
+    print(f"Connected with result code {reason_code}")
+    sub.logger.info(f"Connected with result code {reason_code}")
+
+    if sub.ntopics == 0:
+        client.subscribe(sub.topic, qos=sub.qos)
+    elif sub.ntopics > 0:
+        topics2subscribe = [(get_topic_name(sub.topic,idx), sub.qos) for idx in range(sub.ntopics)]
+        client.subscribe(topics2subscribe)
+
+
+def get_topic_name(prefix: str, i: int):
+    return '/'.join((prefix, f'node{str(i + 1)}'))
+
+
+def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
+    print(f"Disconnected from Broker")
+    sub.logger.info("Disconnected from Broker")
+
+
+def on_message(client, userdata, msg):
+    print(f"Received message: {msg.topic} -> {msg.payload.decode('utf-8')}")
+    sub.logger.info(f"Received message on topic: {msg.topic}")
+    if msg.properties.UserProperty[0][0] == 'unique_message_id':
+        mid = msg.properties.UserProperty[0][1]  # msg.useuserdata['unique_message_id']
+        if msg.properties.UserProperty[1][0] == 'publisher_send_time':
+            send_time = float(msg.properties.UserProperty[1][1])  # userdata['publisher_send_time']
+            recv_time = time.time() * 1000;  # convert to ms
+            sub.log(mid,send_time,recv_time,msg.topic,len(msg.payload))
+
+
+def on_subscribe(client, userdata, mid, reason_code_list, properties):
+    print(f"Subscribed to MID: {mid} with codes: {reason_code_list}")
+    sub.logger.info(f"Subscribed to MID: {mid} with codes: {reason_code_list}")
 
 
 if __name__ == '__main__':
     try:
         parser = argparse.ArgumentParser(description="Provide the log file name")
         parser.add_argument("--logfile", required=True, help="Path to the log file")
-        args = parser.parse_args()
-        lfile = args.logfile
+        parser.add_argument("--ntopics",type=int, default=0, help="Number of topics for to subscribe sequentially")
 
         # Get VUWSN config
-        config = getVUWSNConfig()
+        parser.add_argument("--configfile", required=True, default="configs/config-broker-evaluation.yml",
+                            help="Path to the config file")
+        args = parser.parse_args()
 
-        sub = Subscriber(lfile, config.MQTT_CONFIG.BROKER_CONFIG.BROKER_URL,config.MQTT_CONFIG.BROKER_CONFIG.TOPIC,
-                         config.MQTT_CONFIG.BROKER_CONFIG.QOS,config.MQTT_CONFIG.CONNECT_CONFIG.KEEPALIVE,
-                         config.MQTT_CONFIG.CONNECT_CONFIG.CLEAN_START)
+        if not os.path.exists(args.configfile):
+            raise RuntimeError (f"Error: The configfile '{args.configfile}' does not exist.")
+        config = getVUWSNConfig(args.configfile)
+
+        lfile = args.logfile
+        sub = Subscriber(lfile, config.MQTT_CONFIG.BROKER_CONFIG.BROKER_URL, config.MQTT_CONFIG.BROKER_CONFIG.BROKER_PORT,
+                         config.MQTT_CONFIG.BROKER_CONFIG.TOPIC,
+                         config.MQTT_CONFIG.BROKER_CONFIG.QOS, config.MQTT_CONFIG.CONNECT_CONFIG.KEEPALIVE,
+                         config.MQTT_CONFIG.CONNECT_CONFIG.CLEAN_START,topics=args.ntopics)
 
         # connect and subscribe
-        client = mqtt.Client()
-        client.on_connect = sub.on_connect
-        client.on_message = sub.on_message
+        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2, protocol=MQTTProtocolVersion.MQTTv5)
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.on_disconnect = on_disconnect
+        client.on_subscribe = on_subscribe
 
-        client.connect(sub.addr, sub.port, sub.keep_alive)
+        client.connect(host=sub.addr, port=sub.port, keepalive=sub.keep_alive)
 
-        client.loop_start()
-        while True:
-            pass
+        client.loop_forever(retry_first_connection=True)
+
     except KeyboardInterrupt:
         print("Exited with KeyboardInterrupt")
+        sub.logger.error("Exited with KeyboardInterrupt")
+    except Exception as e:
+        print(f"Error: {e}")
+        sub.logger.error(f"Error: {e}")
     finally:
-        client.loop_stop()
+        # client.loop_stop()
         client.disconnect()
 

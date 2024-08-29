@@ -1,5 +1,3 @@
-import argparse
-import os
 from decouple import config
 import yaml
 import sys
@@ -30,7 +28,7 @@ class VUWSNConfig:
             self.SMARTOCEAN_DATA_CONFIG = so_data_config
 
 
-def getVUWSNConfig()->VUWSNConfig:
+def getVUWSNConfig(configfile)->VUWSNConfig:
     """
         Get the VUWSN configuration from the environment and config file.
         If no config file is specified, the default config file, located at 'configs/config-broker-evaluation.yml',  is used.
@@ -41,40 +39,35 @@ def getVUWSNConfig()->VUWSNConfig:
         Raises:
             VUWSNConfigurationException: If an error occurs when loading the configuration.
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--configfile", default="configs/config-broker-evaluation.yml", help="Path to the config file")
-    args = parser.parse_args()
-
-    if not os.path.exists(args.configfile):
-        raise VUWSNConfigurationException(f"Error: The configfile '{args.configfile}' does not exist.")
     
     # load credentials
     try:  
-        USERNAME = config('BROKER_USERNAME')
-        PASSWORD = config('BROKER_PASSWORD')
+        USERNAME = config('BROKER_USERNAME', default='')
+        PASSWORD = config('BROKER_PASSWORD', default='')
     except Exception as e:
-        raise VUWSNConfigurationException(f"Error when reading credentials from environment: {e}")
-    
+        # raise VUWSNConfigurationException(f"Error when reading credentials from environment: {e}")
+        print("Warning! Error loading credentials. Vulnerable connection without credentials.")
+
     # load configuration from config file
     try:
-        with open(args.configfile) as f:
-            conf = yaml.load(f, Loader=yaml.FullLoader)
-            BROKER_PORT = conf['BROKER_PORT']
-            BROKER = conf['BROKER_URL']
-            TOPIC = conf['TOPIC']
-            QOS = conf['QOS']
-            CLEAN_START = conf.get('CLEAN_START', False)
-            KEEPALIVE = conf.get('KEEPALIVE', 120)
-            SESSION_EXPIRY_INTERVAL = conf.get('SESSION_EXPIRY_INTERVAL', 3600)
-            TLS_ENABLED = conf.get('TLS_ENABLED', False)
-            RETAIN = conf.get('RETAIN', False)
-            REATTEMPTS = conf.get('REATTEMPTS', 5)
-            REATTEMPT_MIN_DELAY = conf.get('REATTEMPT_MIN_DELAY', 2)
-            REATTEMPT_MAX_DELAY = conf.get('REATTEMPT_MAX_DELAY', 3600)
-            NR_OF_MESSAGES = conf.get('NR_OF_MESSAGES')
-            PUBLISH_INTERVAL = conf.get('PUBLISH_INTERVAL', 5)
-            TESTDATA_PATH = conf.get("TESTDATA_PATH", "").strip() # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
-
+        with open(configfile) as f:
+            conf = yaml.safe_load(f)
+            BROKER_PORT = config('BROKER_PORT', default=conf['BROKER_PORT'], cast=int)
+            BROKER =  config('BROKER_URL', default=conf['BROKER_URL'])
+            TOPIC =  config('TOPIC', default=conf['TOPIC'])
+            QOS =  config('QOS', default=conf['QOS'], cast=int)
+            CLEAN_START =  config('CLEAN_START', default=conf.get('CLEAN_START', False))
+            KEEPALIVE =  config('KEEPALIVE', default=conf.get('KEEPALIVE', 120), cast=int)
+            SESSION_EXPIRY_INTERVAL =  config('SESSION_EXPIRY_INTERVAL', default=conf.get('SESSION_EXPIRY_INTERVAL', 3600), cast=int)
+            TLS_ENABLED =  config('TLS_ENABLED', default=conf.get('TLS_ENABLED', False))
+            RETAIN =  config('RETAIN', default=conf.get('RETAIN', False))
+            REATTEMPTS =  config('REATTEMPTS', default=conf.get('REATTEMPTS', 5), cast=int)
+            REATTEMPT_MIN_DELAY =  config('REATTEMPT_MIN_DELAY', default=conf.get('REATTEMPT_MIN_DELAY', 2), cast=int)
+            REATTEMPT_MAX_DELAY =  config('REATTEMPT_MAX_DELAY', default=conf.get('REATTEMPT_MAX_DELAY', 3600), cast=int)
+            NR_OF_MESSAGES =  config('NR_OF_MESSAGES', default=conf.get('NR_OF_MESSAGES', 0), cast=int)
+            PUBLISH_INTERVAL =  config('PUBLISH_INTERVAL', default=conf.get('PUBLISH_INTERVAL', 5), cast=int)
+            TESTDATA_PATH =  config('TESTDATA_PATH', default=conf.get("TESTDATA_PATH", "").strip()) # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
+            CLIENT_ID = config('CLIENT_ID', default=conf.get('CLIENT_ID',None))
             so_data_config = None
             if TESTDATA_PATH is None or TESTDATA_PATH == "":
                 # Load SmartOcean data configuration
@@ -91,7 +84,7 @@ def getVUWSNConfig()->VUWSNConfig:
         raise VUWSNConfigurationException(f"Error when reading from config file: {e}")
 
     connect_config = ConnectConfig(use_tls=TLS_ENABLED, clean_start=CLEAN_START, keepalive=KEEPALIVE, 
-                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL)
+                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL,client_id=CLIENT_ID)
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
 
