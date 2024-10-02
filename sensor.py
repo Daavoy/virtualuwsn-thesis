@@ -1,7 +1,7 @@
 import math
 import time
 
-from datamodels.tsdatamodel.timeseriesdata import *
+from sfisop.datamodels.tsdatamodel.timeseriesdata import *
 
 from abc import abstractmethod
 
@@ -32,7 +32,7 @@ class VirtualSensor(Sensor):
     def simulate_value(self) -> str:
         pass
 
-    def read(self) -> str:
+    def read(self) -> Observation:
         NO_DATAQUALITY_CODE = 0
 
         obs = Observation(source=self.source,

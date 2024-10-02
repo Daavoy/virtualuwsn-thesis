@@ -1,11 +1,9 @@
-import sys
-import os
 import logging
 
 from mqtt_connector.mqtt.client import MQTTPublisher
 
 from gateway import Gateway
-from datamodels.tsdatamodel.timeseriesdata import Location
+from sfisop.datamodels.tsdatamodel.timeseriesdata import Location
 from hubnode import HubNode
 from vuwsn import *
 from utils.config_utils import *
