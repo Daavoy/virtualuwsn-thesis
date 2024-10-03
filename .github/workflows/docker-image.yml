@@ -1,0 +1,21 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "cont_deployment" ]
+  pull_request:
+    branches: [ "cont_deployment" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:      
+    - uses: actions/checkout@v4
+      with:
+          submodules: 'true'
+          token: ${{ secrets.PAT_TOKEN }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
