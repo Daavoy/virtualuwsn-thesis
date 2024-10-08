@@ -8,14 +8,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY virtualuwsn/requirements.txt .
+COPY ./requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
-COPY  virtualuwsn /app
-
-# Copy mqtt_connector from the parent folder to the /app folder
-COPY mqtt_connector /app/mqtt_connector
+COPY  . /app
 
 # Add the datamodels and mqtt_connector folder to the PYTHONPATH
 ENV PYTHONPATH=/app/mqtt_connector/:$PYTHONPATH
