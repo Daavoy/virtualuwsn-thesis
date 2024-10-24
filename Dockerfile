@@ -8,25 +8,22 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
-
 COPY  . /app
 
 # Copy mqtt_connector from the parent folder to the /app folder
-COPY mqtt_connector /app/mqtt_connector
+# COPY mqtt_connector /app/mqtt_connector -- handled by git action
 
 # Install pip requirements
 RUN python -m pip install -r requirements.txt
 
-
-# Add the datamodels and mqtt_connector folder to the PYTHONPATH
-ENV PYTHONPATH=/app/datamodels/:/app/mqtt_connector/
+# Add the mqtt_connector folder to the PYTHONPATH
+ENV PYTHONPATH=/app/mqtt_connector/:$PYTHONPATH
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-WORKDIR /app
 RUN mkdir -p "logs"
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug

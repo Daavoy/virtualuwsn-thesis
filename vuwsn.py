@@ -1,6 +1,6 @@
+from sensor import *
 from gateway import Gateway
 from hubnode import HubNode, TempCondBattNode
-from sensor import *
 from abc import abstractmethod
 import os
 

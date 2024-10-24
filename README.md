@@ -13,7 +13,7 @@ Clone the git repository
 git clone https://github.com/smartoceanplatform/virtualuwsn.git
 ```
 
-The repository uses git submodules to include the [smartocean data model](https://github.com/smartoceanplatform/datamodels). The data model submodule can be fetched using:
+The repository uses git submodules to include the [smartocean MQTT Client Wrapper](https://github.com/smartoceanplatform/mqtt_connector). The submodule can be fetched using:
 
 ```
 git submodule update --init --recursive
