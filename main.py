@@ -1,15 +1,9 @@
 import argparse
-import sys
-import os
 import logging
-
-from mqtt_connector.mqtt.client import MQTTPublisher
-
-from gateway import Gateway
-from datamodels.tsdatamodel.timeseriesdata import Location
-from hubnode import HubNode
 from vuwsn import *
 from utils.config_utils import *
+from mqtt_connector.mqtt.client import MQTTPublisher
+
 
 if __name__ == "__main__":
     try:
@@ -32,10 +26,9 @@ if __name__ == "__main__":
             sdc = config.SMARTOCEAN_DATA_CONFIG
             if sdc is not None:
                 location = Location(latitude=sdc.LOCATION_LATITUDE, longitude=sdc.LOCATION_LONGITUDE)
-                vuwsn = TempCondBattVUWSN(description=sdc.DESCRIPTION,format=sdc.FORMAT, origin=sdc.TIMESERIES, timeseries=sdc.TIMESERIES, 
-                                          source=sdc.SOURCE, source_id=sdc.SOURCE_ID, location=location)
-                node = HubNode(sdc.DESCRIPTION, sdc.TIMESERIES, vuwsn)
-                gateway = Gateway("Virtual SmartOcean Gateway", [node])
+                vuwsn = SmartOceanVUWSN(description=sdc.DESCRIPTION,format=sdc.FORMAT, origin=sdc.TIMESERIES,
+                                        timeseries=sdc.TIMESERIES, source=sdc.SOURCE, source_id=sdc.SOURCE_ID,
+                                        location=location)
             else:
                 print("Error: No test data path or SmartOcean data configuration found")
         elif not os.path.exists(config.TESTDATA_PATH):
@@ -43,16 +36,20 @@ if __name__ == "__main__":
         else:
             origin = f"Data File {config.TESTDATA_PATH}"
             vuwsn = FileVUWSN("Data File VUWSN", config.TESTDATA_PATH)
-            node = HubNode("VUWSN for historic data", origin, vuwsn)
-            gateway = Gateway(f"Virtual Data File Gateway {config.TESTDATA_PATH}", [node])
-        
-        if gateway is not None:
-            if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
-                # MQTT setup
-                mqtt_publisher = MQTTPublisher("Publisher", config.MQTT_CONFIG, gateway.logger)
-                gateway.run(config.NR_OF_MESSAGES, config.PUBLISH_INTERVAL, mqtt_publisher)
-            else:
-                print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")
+
+        if not vuwsn.sinks:
+            for gateway in vuwsn.sinks:
+                if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
+                    # MQTT setup
+                    mqtt_publisher = MQTTPublisher("Publisher", config.MQTT_CONFIG, gateway.logger)
+
+                    gateway.log(f"Starting publishing {config.NR_OF_MESSAGES} messages with {config.PUBLISH_INTERVAL} second intervals")
+                    for i in range(1, config.NR_OF_MESSAGES + 1):
+                        gateway.run(mqtt_publisher)
+
+                    time.sleep(config.PUBLISH_INTERVAL)
+                else:
+                    print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")
         else:
             # log error
             print("Error: Gateway was not configured correctly")
