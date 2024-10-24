@@ -1,5 +1,4 @@
-from datamodels.tsdatamodel.metadata import *
-from datamodels.tsdatamodel.timeseriesdata import *
+from sfisop import datamodels
 
 from sensor import Sensor
 from vuwsn import *
