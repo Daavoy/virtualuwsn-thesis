@@ -23,8 +23,6 @@ if __name__ == "__main__":
         config = getVUWSNConfig(args.configfile)
 
         # VUWSN setup
-        gateway = None
-
         if config.TESTDATA_PATH is None or config.TESTDATA_PATH == "":
             sdc = config.SMARTOCEAN_DATA_CONFIG
             if sdc is not None:
@@ -40,7 +38,7 @@ if __name__ == "__main__":
             origin = f"Data File {config.TESTDATA_PATH}"
             vuwsn = FileVUWSN("Data File VUWSN", config.TESTDATA_PATH)
 
-        if not vuwsn.sinks:
+        if vuwsn.sinks:
             for gateway in vuwsn.sinks:
                 if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
                     # MQTT setup
@@ -50,6 +48,7 @@ if __name__ == "__main__":
                     for i in range(1, config.NR_OF_MESSAGES + 1):
                         gateway.run(mqtt_publisher)
 
+                    mqtt_publisher.stop()
                     time.sleep(config.PUBLISH_INTERVAL)
                 else:
                     print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")

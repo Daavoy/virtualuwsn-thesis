@@ -2,6 +2,7 @@ import uuid
 from hubnode import *
 import time
 import hashlib
+import os
 from utils.log_utils import getFileHandler
 from paho.mqtt.properties import Properties, PacketTypes
 
@@ -58,7 +59,7 @@ class Gateway:
             #hub_idx = (hub_idx + 1) % len(self.hubs)
 
         self.log(f'Gateway finished transmitting data. Transmitted {len(self.hubs) - nr_of_failed_transmits}/{len(self.hubs)} messages')
-        publisher.stop()
+        # publisher.stop()
 
     # TODO: Add method to add/remove hubs to gateway?
 
