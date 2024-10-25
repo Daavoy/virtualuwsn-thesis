@@ -1,6 +1,6 @@
 from sensor import *
 from gateway import Gateway
-from hubnode import HubNode, TempCondBattNode
+from hubnode import HubNode, TempCondBattNode, FileHubNode
 from abc import abstractmethod
 import os
 
@@ -9,6 +9,7 @@ class VUWSN:
     def __init__(self, description: str):
         self.description = description
         self.sinks = list()
+        self.get_gateways()
 
     @abstractmethod
     def get_gateways(self) -> list[Gateway]:
@@ -46,9 +47,9 @@ class FileVUWSN(VUWSN):
     """
 
     def __init__(self, description: str, data_path: str):
-        super().__init__(description)
         self.data_path = data_path
         self.folders   = [f for f in os.listdir(self.data_path) if os.path.isdir(os.path.join(self.data_path, f))]
+        super().__init__(description)
 
     def get_gateways(self) -> list[Gateway]:
         """
@@ -57,12 +58,12 @@ class FileVUWSN(VUWSN):
         """
         for idx, sink in enumerate(self.folders):
             hubnodes = list()
-
-            for i, file in enumerate(os.listdir(sink)):
-                if os.path.isfile(os.path.join(self.data_path, file)):
+            _path = os.path.join(self.data_path, sink)
+            for i, file in enumerate(os.listdir(_path)):
+                if os.path.isfile(os.path.join(_path, file)):
                     origin = '.'.join((os.path.basename(self.data_path), sink, f'hub{i+1}'))
-                    filepath = os.path.join(self.data_path, file)
-                    node = HubNode(f"Hub {idx + 1}: for historic data", origin, filepath)
+                    filepath = os.path.join(_path, file)
+                    node = FileHubNode(f"Hub {idx + 1}: for historic data", origin, filepath)
                     hubnodes.append(node)
 
             gateway = Gateway(f"{'.'.join((os.path.basename(self.data_path), sink))}", hubnodes)
