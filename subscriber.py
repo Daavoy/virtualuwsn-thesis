@@ -2,8 +2,11 @@ import argparse
 import logging
 import os
 import time
+from pathlib import Path
+from decouple import config as envparser
 
 import paho.mqtt.client as mqtt
+
 from paho.mqtt.enums import MQTTProtocolVersion
 
 from utils.config_utils import getVUWSNConfig
@@ -14,7 +17,8 @@ global sub
 
 class Subscriber:
 
-    def __init__(self, logfile, addr, port, topic, qos, keep_alive,clean=False,tls=False,topics=0):
+    def __init__(self, id,logfile, addr, port, topic, qos, keep_alive,clean=False,tls=False,topics=0):
+        self.id = id
         self.topic = topic
         self.addr = addr
         self.port = port
@@ -30,13 +34,26 @@ class Subscriber:
         self.logger = logging.getLogger("Exec-Log")
         self.logger.setLevel(logging.INFO)
 
+        # Create log path in case it not exists
+        path = Path(logfile)
+        directory = path.parent.absolute()
+        directory.mkdir(parents=True, exist_ok=True)
+
         handler = TimedRotatingFileHandler(logfile, when="m", interval=60, backupCount=100)
 
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
+        self.logger.info(f"Subscriber: [Initialized] \n{self}")
 
-    def log(self,mid,send,recv,topic,size):
-        msg = ','.join((mid,str(send),str(recv),topic,str(size)))
+    def __str__(self):
+        return ''.join((f'MQTT Client Configuration: \n',
+                        f'CLIENT_ID: {self.id} \n',
+                        f'BROKER_URL: {self.addr}:{self.port} \n',
+                        f'TOPIC: {self.topic}:{self.qos} \n',
+                        f'CONNECT CONFIG: tls={self.tls}, clean_start={self.clean_sesh}, keepalive={self.keep_alive},'))
+
+    def log(self,mid,send,recv,topic,payload_size,msg_size,topic_size):
+        msg = ','.join((mid,str(send),str(recv),topic,str(payload_size)),str(msg_size),str(topic_size))
         self.logger.info(msg)
 
 
@@ -63,12 +80,13 @@ def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
 def on_message(client, userdata, msg):
     print(f"Received message: {msg.topic} -> {msg.payload.decode('utf-8')}")
     sub.logger.info(f"Received message on topic: {msg.topic}")
-    if msg.properties.UserProperty[0][0] == 'unique_message_id':
-        mid = msg.properties.UserProperty[0][1]  # msg.useuserdata['unique_message_id']
-        if msg.properties.UserProperty[1][0] == 'publisher_send_time':
-            send_time = float(msg.properties.UserProperty[1][1])  # userdata['publisher_send_time']
-            recv_time = time.time() * 1000;  # convert to ms
-            sub.log(mid,send_time,recv_time,msg.topic,len(msg.payload))
+    if not msg.properties.isEmpty():
+        if msg.properties.UserProperty[0][0] == 'unique_message_id':
+            mid = msg.properties.UserProperty[0][1]  # msg.useuserdata['unique_message_id']
+            if msg.properties.UserProperty[1][0] == 'publisher_send_time':
+                send_time = float(msg.properties.UserProperty[1][1])  # userdata['publisher_send_time']
+                recv_time = time.time() * 1000;  # convert to ms
+                sub.log(mid, send_time, recv_time, msg.topic, len(msg.payload), len(msg), len(msg.topic))
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):
@@ -80,7 +98,7 @@ if __name__ == '__main__':
     try:
         parser = argparse.ArgumentParser(description="Provide the log file name")
         parser.add_argument("--logfile", required=True, help="Path to the log file")
-        parser.add_argument("--ntopics",type=int, default=0, help="Number of topics for to subscribe sequentially")
+        parser.add_argument("--ntopics",type=int, default=0, help="Number of topics to subscribe sequentially")
 
         # Get VUWSN config
         parser.add_argument("--configfile", required=True, default="configs/config-broker-evaluation.yml",
@@ -92,28 +110,47 @@ if __name__ == '__main__':
         config = getVUWSNConfig(args.configfile)
 
         lfile = args.logfile
-        sub = Subscriber(lfile, config.MQTT_CONFIG.BROKER_CONFIG.BROKER_URL, config.MQTT_CONFIG.BROKER_CONFIG.BROKER_PORT,
-                         config.MQTT_CONFIG.BROKER_CONFIG.TOPIC,
-                         config.MQTT_CONFIG.BROKER_CONFIG.QOS, config.MQTT_CONFIG.CONNECT_CONFIG.KEEPALIVE,
-                         config.MQTT_CONFIG.CONNECT_CONFIG.CLEAN_START,topics=args.ntopics)
+        sub = Subscriber(id=config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID,
+                         logfile=lfile, addr=config.MQTT_CONFIG.BROKER_CONFIG.BROKER_URL,
+                         port=config.MQTT_CONFIG.BROKER_CONFIG.BROKER_PORT,
+                         topic=config.MQTT_CONFIG.BROKER_CONFIG.TOPIC,
+                         qos=config.MQTT_CONFIG.BROKER_CONFIG.QOS,
+                         keep_alive=config.MQTT_CONFIG.CONNECT_CONFIG.KEEPALIVE,
+                         clean=config.MQTT_CONFIG.CONNECT_CONFIG.CLEAN_START,
+                         tls=config.MQTT_CONFIG.CONNECT_CONFIG.USE_TLS,
+                         topics=args.ntopics)
 
         # connect and subscribe
-        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2, protocol=MQTTProtocolVersion.MQTTv5)
+        client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2, protocol=MQTTProtocolVersion.MQTTv5,
+                             client_id=sub.id,reconnect_on_failure=True)
         client.on_connect = on_connect
         client.on_message = on_message
         client.on_disconnect = on_disconnect
         client.on_subscribe = on_subscribe
 
-        client.connect(host=sub.addr, port=sub.port, keepalive=sub.keep_alive)
+        if sub.tls:
+            client.tls_set()
+
+        username=envparser('BROKER_USERNAME', cast=str)
+        pwd=envparser('BROKER_PASSWORD', cast=str)
+
+        client.username_pw_set(username=username, password=pwd)
+        client.connect(host=sub.addr, port=sub.port, keepalive=sub.keep_alive,clean_start=sub.clean_sesh)
+
 
         client.loop_forever(retry_first_connection=True)
 
     except KeyboardInterrupt:
-        print("Exited with KeyboardInterrupt")
-        sub.logger.error("Exited with KeyboardInterrupt")
+        if sub is None:
+            print("Exited with KeyboardInterrupt")
+        else:
+            sub.logger.error("Exited with KeyboardInterrupt")
     except Exception as e:
-        print(f"Error: {e}")
-        sub.logger.error(f"Error: {e}")
+        if sub is None:
+            print(f"Error: {e}")
+        else:
+            print(f"Error: {e.with_traceback()}")
+            sub.logger.error(f"Error: {e}")
     finally:
         # client.loop_stop()
         client.disconnect()
