@@ -67,7 +67,7 @@ def getVUWSNConfig(configfile)->VUWSNConfig:
             NR_OF_MESSAGES =  config('NR_OF_MESSAGES', default=conf.get('NR_OF_MESSAGES', 0), cast=int)
             PUBLISH_INTERVAL =  config('PUBLISH_INTERVAL', default=conf.get('PUBLISH_INTERVAL', 5), cast=int)
             TESTDATA_PATH =  config('TESTDATA_PATH', default=conf.get("TESTDATA_PATH", "").strip()) # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
-            CLIENT_ID = config('CLIENT_ID', default=conf.get('CLIENT_ID',None))
+            CLIENT_ID = config('CLIENT_ID', default=conf.get('CLIENT_ID',None), cast=str)
             so_data_config = None
             if TESTDATA_PATH is None or TESTDATA_PATH == "":
                 # Load SmartOcean data configuration
