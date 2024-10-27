@@ -52,8 +52,8 @@ class Subscriber:
                         f'TOPIC: {self.topic}:{self.qos} \n',
                         f'CONNECT CONFIG: tls={self.tls}, clean_start={self.clean_sesh}, keepalive={self.keep_alive},'))
 
-    def log(self,mid,send,recv,topic,payload_size,msg_size,topic_size):
-        msg = ','.join((mid,str(send),str(recv),topic,str(payload_size)),str(msg_size),str(topic_size))
+    def log(self,mid,send,recv,topic,payload_size,topic_size):
+        msg = ','.join((mid,str(send),str(recv),topic,str(payload_size),str(topic_size)))
         self.logger.info(msg)
 
 
@@ -78,7 +78,7 @@ def on_disconnect(client, userdata, disconnect_flags, reason_code, properties):
 
 
 def on_message(client, userdata, msg):
-    print(f"Received message: {msg.topic} -> {msg.payload.decode('utf-8')}")
+    # print(f"Received message: {msg.topic} -> {msg.payload.decode('utf-8')}")
     sub.logger.info(f"Received message on topic: {msg.topic}")
     if not msg.properties.isEmpty():
         if msg.properties.UserProperty[0][0] == 'unique_message_id':
@@ -86,7 +86,7 @@ def on_message(client, userdata, msg):
             if msg.properties.UserProperty[1][0] == 'publisher_send_time':
                 send_time = float(msg.properties.UserProperty[1][1])  # userdata['publisher_send_time']
                 recv_time = time.time() * 1000;  # convert to ms
-                sub.log(mid, send_time, recv_time, msg.topic, len(msg.payload), len(msg), len(msg.topic))
+                sub.log(mid, send_time, recv_time, msg.topic, len(msg.payload), len(msg.topic))
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):
@@ -149,7 +149,6 @@ if __name__ == '__main__':
         if sub is None:
             print(f"Error: {e}")
         else:
-            print(f"Error: {e.with_traceback()}")
             sub.logger.error(f"Error: {e}")
     finally:
         # client.loop_stop()
