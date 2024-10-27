@@ -57,23 +57,24 @@ Broker credentials are to be placed in a .env file with the following content:
 
 The remaining configuration is placed in a `.yml` file with the following content: 
 
-| Config variable     | Explanation                                                                          | Mandatory | Default     |
-|---------------------|--------------------------------------------------------------------------------------|-----------|-------------|
-| BROKER_URL          | URL of the MQTT broker                                                               | Yes       | -           |
-| BROKER_PORT         | Port number of the MQTT broker                                                       | Yes       | -           |
-| TOPIC               | MQTT topic to publish messages to                                                    | Yes       | -           |
-| QOS                 | Quality of Service level for message delivery                                        | Yes       | -           |
-| NR_OF_MESSAGES      | Number of messages to publish                                                        | Yes       | -           |
-| CLEAN_START         | Determines if the client starts with a clean session.                                | Yes       | False       |
-| KEEPALIVE           | Maximum period in seconds between communications with the broker. If no other messages are being exchanged, this controls the rate at which the client will send ping messages to the broker.                                 | Yes       | 120         |
-| SESSION_EXPIRY_INTERVAL  | Session expiry interval for MQTT session in seconds                             | Yes       | 3600        |
-| PUBLISH_INTERVAL  | Interval between each publish                                                        | Yes       | 5           |
-| TLS_ENABLED         | Determines if the client is configured with TLS                                      | Yes       | False       |
-| RETAIN              | Determines the retain flag for publish packets                                       | Yes       | False       |
-| REATTEMPTS  | Determines the amount of connect attempts before shutting down. < 0 means no limit           | Yes       | 5           |
-| REATTEMPT_MIN_DELAY | Sets the minimum time period, in seconds, to wait before trying to reattempt connect | Yes       | 2           |
-| REATTEMPT_MAX_DELAY | Sets the maximum time period, in seconds, to wait before trying to reattempt connect | Yes       | 3600        |
-| TESTDATA_PATH       | Path to test data                                                                    | No        | ""          |
+| Config variable         | Explanation                                                                                                                                                                                 | Mandatory | Default |
+|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
+| BROKER_URL              | URL of the MQTT broker                                                                                                                                                                      | Yes       | -       |
+| BROKER_PORT             | Port number of the MQTT broker                                                                                                                                                              | Yes       | -       |
+| TOPIC                   | MQTT topic prefix to publish messages to. Gateway name added as suffix                                                                                                                      | Yes       | -       |
+| CLIENT_ID               | Client ID prefix - used in RBAC at broker side. Gateway name added as suffix                                                                                                                | No        | None    |
+| QOS                     | Quality of Service level for message delivery                                                                                                                                               | Yes       | -       |
+| NR_OF_MESSAGES          | Number of messages to publish                                                                                                                                                               | Yes       | -       |
+| CLEAN_START             | Determines if the client starts with a clean session.                                                                                                                                       | Yes       | False   |
+| KEEPALIVE               | Maximum period in seconds between communications with the broker. If no other messages are being exchanged, this controls the rate at which the client will send ping messages to the broker. | Yes       | 120     |
+| SESSION_EXPIRY_INTERVAL | Session expiry interval for MQTT session in seconds                                                                                                                                         | Yes       | 3600    |
+| PUBLISH_INTERVAL        | Interval between each publish                                                                                                                                                               | Yes       | 5       |
+| TLS_ENABLED             | Determines if the client is configured with TLS                                                                                                                                             | Yes       | False   |
+| RETAIN                  | Determines the retain flag for publish packets                                                                                                                                              | Yes       | False   |
+| REATTEMPTS              | Determines the amount of connect attempts before shutting down. < 0 means no limit                                                                                                          | Yes       | 5       |
+| REATTEMPT_MIN_DELAY     | Sets the minimum time period, in seconds, to wait before trying to reattempt connect                                                                                                        | Yes       | 2       |
+| REATTEMPT_MAX_DELAY     | Sets the maximum time period, in seconds, to wait before trying to reattempt connect                                                                                                        | Yes       | 3600    |
+| TESTDATA_PATH           | Path to test data                                                                                                                                                                           | No        | ""      |
 
 The generation of data in the SmartOcean format can be configured by adding the following content to the `.yml` file. 
 
