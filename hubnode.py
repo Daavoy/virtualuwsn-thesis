@@ -8,9 +8,9 @@ from abc import abstractmethod
 
 class HubNode:
 
-    def __init__(self, description: str, origin: str):
+    def __init__(self, description: str, name: str):
         self.description = description
-        self.origin = origin
+        self.name = name
 
     @abstractmethod
     def transmit(self) -> str:
@@ -23,8 +23,8 @@ class HubNode:
 
 class FileHubNode(HubNode):
 
-    def __init__(self, description: str, origin: str, data_path: str):
-        super().__init__(description, origin)
+    def __init__(self, description: str, name: str, data_path: str):
+        super().__init__(description, name)
         self.data_file_path = data_path
 
     def transmit(self) -> str:
@@ -41,13 +41,13 @@ class FileHubNode(HubNode):
 class TempCondBattNode(HubNode):
 
     def __init__(self, description: str, format: str,
-                 origin: str, timeseries: str,
+                 name: str, timeseries: str,
                  source: str, source_id: str,
                  location: Location, sensors: List[Sensor]):
 
-        super().__init__(description, origin)
+        super().__init__(description, name)
         self.format = format
-        self.origin = origin
+        self.origin = name
         self.timeseries = timeseries
         self.source = source
         self.source_id = source_id

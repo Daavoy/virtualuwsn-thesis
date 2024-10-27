@@ -36,18 +36,33 @@ if __name__ == "__main__":
             print(f"Error: The data_path '{config.TESTDATA_PATH}' does not exist.")
         else:
             origin = f"Data File {config.TESTDATA_PATH}"
-            vuwsn = FileVUWSN("Data File VUWSN", config.TESTDATA_PATH)
+            vuwsn = FileVUWSN(origin, config.TESTDATA_PATH)
 
         if vuwsn.sinks:
+            # Get input prefix
+            id_prefix = config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID
+            user_prefix = config.MQTT_CONFIG.BROKER_CONFIG.USERNAME
+            topic_prefix = config.MQTT_CONFIG.BROKER_CONFIG.TOPIC
             # MQTT client setup per gateway
             for gateway in vuwsn.sinks:
                 if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
-                    # MQTT client id setup based on CLIENT_ID parameter in the yml configuration file
-                    id_prefix=config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID
-                    config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = '/'.join((id_prefix, gateway.name))
+
+                    # MQTT client id setup based on CLIENT_ID parameter in the yml configuration file if not None
+                    if id_prefix and id_prefix is not None and not id_prefix == "":
+                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = '/'.join((id_prefix, gateway.name.replace('.','/')))
+                    else:
+                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = gateway.name.replace('.','/')
+
+                    # MQTT publish topic setup based on USERNAME env variable in the yml configuration file
+                    if user_prefix and user_prefix is not None and not user_prefix == "":
+                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = '.'.join((user_prefix, gateway.name))
+                    else:
+                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = gateway.name
+
                     # MQTT publish topic setup based on CLIENT_ID parameter in the yml configuration file
-                    topic_prefix=config.MQTT_CONFIG.BROKER_CONFIG.TOPIC
-                    config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name))
+                    config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name.replace('.','/')))
+
+                    # MQTT Client
                     mqtt_publisher = MQTTPublisher("Publisher", config.MQTT_CONFIG, gateway.logger)
 
                     gateway.log(f"Starting publishing {config.NR_OF_MESSAGES} messages with {config.PUBLISH_INTERVAL} second intervals")

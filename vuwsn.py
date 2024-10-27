@@ -30,7 +30,7 @@ class SmartOceanVUWSN(VUWSN):
         batt_sensor = BatterySensor("Virtual Battery Sensor", "0003")
 
         basic_node = TempCondBattNode(description=description, timeseries=timeseries, format=format, source=source,
-                                      source_id=source_id, origin=origin, location=location,
+                                      source_id=source_id, name=origin, location=location,
                                       sensors=[temp_sensor, cond_sensor, batt_sensor])
 
         self.gateway = Gateway(name="gateway", sensorhubs=[basic_node])
@@ -63,7 +63,7 @@ class FileVUWSN(VUWSN):
                 if os.path.isfile(os.path.join(_path, file)):
                     origin = '.'.join((os.path.basename(self.data_path), sink, f'hub{i+1}'))
                     filepath = os.path.join(_path, file)
-                    node = FileHubNode(f"Hub {idx + 1}: for historic data", origin, filepath)
+                    node = FileHubNode(f"Hub {idx + 1}: for historic data", f"hub{idx + 1}", filepath)
                     hubnodes.append(node)
 
             gateway = Gateway(f"{'.'.join((os.path.basename(self.data_path), sink))}", hubnodes)

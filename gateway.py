@@ -31,6 +31,8 @@ class Gateway:
         #hub_idx = 0
         #time.sleep(2) # wait before starting simulation
 
+        topic_prefix = publisher.TOPIC
+
         for i, hub in enumerate(self.hubs):
             self.log(f"Starting publishing messages from sensor hub {hub.description}")
             data = hub.transmit()
@@ -47,6 +49,8 @@ class Gateway:
                 publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
                 publish_properties.UserProperty = ("order", str(i))
 
+                publisher.TOPIC = '/'.join((topic_prefix,hub.name))
+
                 if publisher.publish(data, publish_properties):
                     self.log(f'Hub ({hub.description}) - transmitted data')
                 else:
@@ -57,6 +61,7 @@ class Gateway:
                 nr_of_failed_transmits += 1
 
             #hub_idx = (hub_idx + 1) % len(self.hubs)
+            publisher.TOPIC = topic_prefix
 
         self.log(f'Gateway finished transmitting data. Transmitted {len(self.hubs) - nr_of_failed_transmits}/{len(self.hubs)} messages')
         # publisher.stop()
