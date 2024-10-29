@@ -1,6 +1,7 @@
 from decouple import config
 import yaml
 import sys
+from os import path
 
 from mqtt_connector.mqtt.configs import BrokerConfig, ConnectConfig, ReattemptConfig, MQTTClientConfig
 
@@ -68,6 +69,9 @@ def getVUWSNConfig(configfile)->VUWSNConfig:
             PUBLISH_INTERVAL =  config('PUBLISH_INTERVAL', default=conf.get('PUBLISH_INTERVAL', 5), cast=int)
             TESTDATA_PATH =  config('TESTDATA_PATH', default=conf.get("TESTDATA_PATH", "").strip()) # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
             CLIENT_ID = config('CLIENT_ID', default=conf.get('CLIENT_ID',''), cast=str)
+            CA_CERT = config('CA_CERT', default=conf.get('CA_CERT', ''), cast=str)
+            if not path.exists(CA_CERT) or not path.isfile(CA_CERT):
+                CA_CERT = None
             so_data_config = None
             if TESTDATA_PATH is None or TESTDATA_PATH == "":
                 # Load SmartOcean data configuration
@@ -84,7 +88,7 @@ def getVUWSNConfig(configfile)->VUWSNConfig:
         raise VUWSNConfigurationException(f"Error when reading from config file: {e}")
 
     connect_config = ConnectConfig(use_tls=TLS_ENABLED, clean_start=CLEAN_START, keepalive=KEEPALIVE, 
-                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL,client_id=CLIENT_ID)
+                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL,client_id=CLIENT_ID,ca_path=CA_CERT)
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
 

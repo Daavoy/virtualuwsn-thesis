@@ -1,9 +1,9 @@
 import argparse
 import logging
 import os
+import ssl
 import time
 from pathlib import Path
-from decouple import config as envparser
 
 import paho.mqtt.client as mqtt
 
@@ -129,10 +129,12 @@ if __name__ == '__main__':
         client.on_subscribe = on_subscribe
 
         if sub.tls:
-            client.tls_set()
-
-        username=envparser('BROKER_USERNAME', cast=str)
-        pwd=envparser('BROKER_PASSWORD', cast=str)
+            if not config.MQTT_CONFIG.CONNECT_CONFIG.CA_CERT:
+                client.tls_set()
+            else:
+                client.tls_set(ca_certs=config.MQTT_CONFIG.CONNECT_CONFIG.CA_CERT)
+        username=config.MQTT_CONFIG.BROKER_CONFIG.USERNAME
+        pwd=config.MQTT_CONFIG.BROKER_CONFIG.PASSWORD
 
         client.username_pw_set(username=username, password=pwd)
         client.connect(host=sub.addr, port=sub.port, keepalive=sub.keep_alive,clean_start=sub.clean_sesh)
