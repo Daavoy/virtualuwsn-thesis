@@ -48,16 +48,12 @@ if __name__ == "__main__":
                 if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
 
                     # MQTT client id setup based on CLIENT_ID parameter in the yml configuration file if not None
-                    if id_prefix and id_prefix is not None and not id_prefix == "":
-                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = '/'.join((id_prefix, gateway.name.replace('.','/')))
-                    else:
-                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = gateway.name.replace('.','/')
+                    if not id_prefix or id_prefix == "":
+                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = gateway.name
 
                     # MQTT publish topic setup based on USERNAME env variable in the yml configuration file
-                    if user_prefix and user_prefix is not None and not user_prefix == "":
-                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = '.'.join((user_prefix, gateway.name))
-                    else:
-                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = gateway.name
+                    if not user_prefix or user_prefix == "":
+                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = '.'.join((user_prefix,gateway.name))
 
                     # MQTT publish topic setup based on CLIENT_ID parameter in the yml configuration file
                     config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name.replace('.','/')))

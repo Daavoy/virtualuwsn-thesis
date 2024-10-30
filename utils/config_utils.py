@@ -70,7 +70,7 @@ def getVUWSNConfig(configfile)->VUWSNConfig:
             TESTDATA_PATH =  config('TESTDATA_PATH', default=conf.get("TESTDATA_PATH", "").strip()) # Path to test data files, if omitted the simulator will generate custom test data in SmartOcean format
             CLIENT_ID = config('CLIENT_ID', default=conf.get('CLIENT_ID',''), cast=str)
             CA_CERT = config('CA_CERT', default=conf.get('CA_CERT', ''), cast=str)
-            if not path.exists(CA_CERT) or not path.isfile(CA_CERT):
+            if not CA_CERT or not path.exists(CA_CERT) or not path.isfile(CA_CERT):
                 CA_CERT = None
             so_data_config = None
             if TESTDATA_PATH is None or TESTDATA_PATH == "":
