@@ -51,7 +51,7 @@ class Gateway:
 
                 publisher.TOPIC = '/'.join((topic_prefix,hub.name))
 
-                if publisher.publish(data, publish_properties):
+                if publisher.publish(data, publish_properties, 1):  # BLOCKING METHOD!
                     self.log(f'Hub ({hub.description}) - transmitted data')
                 else:
                     self.log(f'Hub ({hub.description}) - failed to transmit data')
