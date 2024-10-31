@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
                     # MQTT publish topic setup based on USERNAME env variable in the yml configuration file
                     if not user_prefix or user_prefix == "":
-                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = '.'.join((user_prefix,gateway.name))
+                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = gateway.name
 
                     # MQTT publish topic setup based on CLIENT_ID parameter in the yml configuration file
                     config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name.replace('.','/')))
