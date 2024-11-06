@@ -26,7 +26,7 @@ class Gateway:
     def log(self, msg: str):
         self.logger.info(msg)
 
-    def run(self, publisher):
+    def run(self, publisher, order=0):
         nr_of_failed_transmits = 0  
         #hub_idx = 0
         #time.sleep(2) # wait before starting simulation
@@ -47,6 +47,8 @@ class Gateway:
                 publish_properties = Properties(PacketTypes.PUBLISH) 
                 publish_properties.UserProperty = ("unique_message_id", str(id)) 
                 publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
+                if order > 0:
+                    publish_properties.UserProperty = ("order", str(order))
 
                 publisher.TOPIC = '/'.join((topic_prefix,hub.name))
 

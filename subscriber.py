@@ -52,8 +52,8 @@ class Subscriber:
                         f'TOPIC: {self.topic}:{self.qos} \n',
                         f'CONNECT CONFIG: tls={self.tls}, clean_start={self.clean_sesh}, keepalive={self.keep_alive},'))
 
-    def log(self,mid,send,recv,topic,payload_size,topic_size):
-        msg = ','.join((mid,str(send),str(recv),topic,str(payload_size),str(topic_size)))
+    def log(self,mid,send,recv,topic,payload_size,topic_size,index):
+        msg = ','.join((mid,str(send),str(recv),topic,str(payload_size),str(topic_size),index))
         self.logger.info(msg)
 
 
@@ -86,7 +86,9 @@ def on_message(client, userdata, msg):
             if msg.properties.UserProperty[1][0] == 'publisher_send_time':
                 send_time = float(msg.properties.UserProperty[1][1])  # userdata['publisher_send_time']
                 recv_time = time.time() * 1000;  # convert to ms
-                sub.log(mid, send_time, recv_time, msg.topic, len(msg.payload), len(msg.topic))
+                if msg.properties.UserProperty[2][0] == 'order':  # userdata['order']
+                    order = msg.properties.UserProperty[2][1]
+                    sub.log(mid, send_time, recv_time, msg.topic, len(msg.payload), len(msg.topic), order)
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):

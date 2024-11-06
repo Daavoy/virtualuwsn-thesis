@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
                         gateway.log(f"Starting publishing {config.NR_OF_MESSAGES} messages with {config.PUBLISH_INTERVAL} second intervals")
                         #for i in range(1, config.NR_OF_MESSAGES + 1):
-                        gateway.run(mqtt_publisher)
+                        gateway.run(mqtt_publisher,i)
                         mqtt_publisher.stop()
 
                     time.sleep(config.PUBLISH_INTERVAL)
