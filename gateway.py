@@ -47,7 +47,6 @@ class Gateway:
                 publish_properties = Properties(PacketTypes.PUBLISH) 
                 publish_properties.UserProperty = ("unique_message_id", str(id)) 
                 publish_properties.UserProperty = ("publisher_send_time", str((time.time()*1000)))
-                publish_properties.UserProperty = ("order", str(i))
 
                 publisher.TOPIC = '/'.join((topic_prefix,hub.name))
 
