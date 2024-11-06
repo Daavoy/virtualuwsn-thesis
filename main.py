@@ -43,32 +43,33 @@ if __name__ == "__main__":
             id_prefix = config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID
             user_prefix = config.MQTT_CONFIG.BROKER_CONFIG.USERNAME
             topic_prefix = config.MQTT_CONFIG.BROKER_CONFIG.TOPIC
-            # MQTT client setup per gateway
-            for gateway in vuwsn.sinks:
-                if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
+            if config.NR_OF_MESSAGES >= 0 and config.PUBLISH_INTERVAL >= 0:
+                for i in range(1, config.NR_OF_MESSAGES + 1):
+                    # MQTT client setup per gateway
+                    for gateway in vuwsn.sinks:
 
-                    # MQTT client id setup based on CLIENT_ID parameter in the yml configuration file if not None
-                    if not id_prefix or id_prefix == "":
-                        config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = gateway.name
+                        # MQTT client id setup based on CLIENT_ID parameter in the yml configuration file if not None
+                        if not id_prefix or id_prefix == "":
+                            config.MQTT_CONFIG.CONNECT_CONFIG.CLIENT_ID = gateway.name
 
-                    # MQTT publish topic setup based on USERNAME env variable in the yml configuration file
-                    if not user_prefix or user_prefix == "":
-                        config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = gateway.name
+                        # MQTT publish topic setup based on USERNAME env variable in the yml configuration file
+                        if not user_prefix or user_prefix == "":
+                            config.MQTT_CONFIG.BROKER_CONFIG.USERNAME = gateway.name
 
-                    # MQTT publish topic setup based on CLIENT_ID parameter in the yml configuration file
-                    config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name.replace('.','/')))
+                        # MQTT publish topic setup based on CLIENT_ID parameter in the yml configuration file
+                        config.MQTT_CONFIG.BROKER_CONFIG.TOPIC = '/'.join((topic_prefix, gateway.name.replace('.','/')))
 
-                    # MQTT Client
-                    mqtt_publisher = MQTTPublisher("Publisher", config.MQTT_CONFIG, gateway.logger)
+                        # MQTT Client
+                        mqtt_publisher = MQTTPublisher("Publisher", config.MQTT_CONFIG, gateway.logger)
 
-                    gateway.log(f"Starting publishing {config.NR_OF_MESSAGES} messages with {config.PUBLISH_INTERVAL} second intervals")
-                    for i in range(1, config.NR_OF_MESSAGES + 1):
+                        gateway.log(f"Starting publishing {config.NR_OF_MESSAGES} messages with {config.PUBLISH_INTERVAL} second intervals")
+                        #for i in range(1, config.NR_OF_MESSAGES + 1):
                         gateway.run(mqtt_publisher)
+                        mqtt_publisher.stop()
 
-                    mqtt_publisher.stop()
                     time.sleep(config.PUBLISH_INTERVAL)
-                else:
-                    print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")
+            else:
+                print(f"Invalid NR_OF_MESSAGES or PUBLISH_INTERVAL: {config.NR_OF_MESSAGES}, {config.PUBLISH_INTERVAL}")
         else:
             # log error
             print("Error: Gateway was not configured correctly")
