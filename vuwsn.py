@@ -63,7 +63,7 @@ class FileVUWSN(VUWSN):
                 if os.path.isfile(os.path.join(_path, file)):
                     origin = '.'.join((os.path.basename(self.data_path), sink, f'hub{i+1}'))
                     filepath = os.path.join(_path, file)
-                    node = FileHubNode(f"Hub {idx + 1}: for historic data", f"hub{idx + 1}", filepath)
+                    node = FileHubNode(f"Hub {i + 1}: for historic data", f"hub{i + 1}", filepath)
                     hubnodes.append(node)
 
             gateway = Gateway(f"{'.'.join((os.path.basename(self.data_path), sink))}", hubnodes)
