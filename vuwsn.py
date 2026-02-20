@@ -34,9 +34,11 @@ class SmartOceanVUWSN(VUWSN):
                                       sensors=[temp_sensor, cond_sensor, batt_sensor])
 
         self.gateway = Gateway(name="gateway", sensorhubs=[basic_node])
+        super().__init__(description)
 
     def get_gateways(self) -> list[Gateway]:
-        return [self.gateway]
+        self.sinks.append(self.gateway)
+        return self.sinks
 
 
 class FileVUWSN(VUWSN):

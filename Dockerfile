@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3
+FROM python:3.12-slim
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -10,8 +10,8 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY  . /app
 
-# Copy mqtt_connector from the parent folder to the /app folder
-# COPY mqtt_connector /app/mqtt_connector -- handled by git action
+# Copy mqtt_connector from the parent folder to the /app folder -- handled by git action
+COPY mqtt_connector /app/mqtt_connector
 
 # Install pip requirements
 RUN python -m pip install -r requirements.txt
