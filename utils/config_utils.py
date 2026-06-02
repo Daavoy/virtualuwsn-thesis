@@ -87,8 +87,8 @@ def getVUWSNConfig(configfile)->VUWSNConfig:
     except Exception as e:
         raise VUWSNConfigurationException(f"Error when reading from config file: {e}")
 
-    connect_config = ConnectConfig(use_tls=TLS_ENABLED, clean_start=CLEAN_START, keepalive=KEEPALIVE, 
-                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL,client_id=CLIENT_ID,ca_path=CA_CERT)
+    connect_config = ConnectConfig(use_tls=TLS_ENABLED, clean_start=CLEAN_START, keepalive=KEEPALIVE,
+                                   session_expiry_interval=SESSION_EXPIRY_INTERVAL, client_id=CLIENT_ID)
     reattempt_config = ReattemptConfig(REATTEMPTS, REATTEMPT_MIN_DELAY, REATTEMPT_MAX_DELAY)
     broker_config = BrokerConfig(USERNAME, PASSWORD, BROKER_PORT, BROKER, TOPIC, QOS)
 
